@@ -106,10 +106,12 @@
             </tbody>
         </table>
 
+        @if(!empty($booking->notes_admin))
         <div class="note-section">
             <strong>Catatan Tambahan dari Admin:</strong><br>
-            {{ $booking->notes_admin ?? 'Tidak ada catatan.' }}
+            {{ $booking->notes_admin }}
         </div>
+        @endif
 
         <div class="note-section">
             Demikian surat izin ini diberikan untuk dapat dipergunakan sebagaimana mestinya. Harap tunjukkan surat ini beserta QR Code kepada petugas keamanan/gedung pada hari pelaksanaan.
