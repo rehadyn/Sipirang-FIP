@@ -4,86 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin — SIPIRANG</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 min-h-screen flex items-center justify-center p-4">
+<body class="font-sans antialiased bg-white min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
 
-    {{-- Background decorative --}}
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl"></div>
-    </div>
+    <div class="w-full max-w-md">
 
-    <div class="relative w-full max-w-md">
+        {{-- Header --}}
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-4">
+                <x-unm-logo class="h-16 w-16" />
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">SIPIRANG</h1>
+            <p class="text-sm text-slate-600">Sistem Peminjaman Ruangan FIP UNM</p>
+        </div>
 
         {{-- Card --}}
-        <div class="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-8">
+        <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+            <div class="p-6 sm:p-8">
 
-            {{-- Logo --}}
-            <div class="flex flex-col items-center mb-8">
-                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-xl mb-4">
-                    <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                {{-- Title --}}
+                <h2 class="text-lg font-semibold text-slate-900 mb-1">Masuk ke Panel Admin</h2>
+                <p class="text-sm text-slate-600 mb-6">Gunakan kredensial Anda untuk mengakses dashboard</p>
+
+                {{-- Error --}}
+                @if($errors->any())
+                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <svg class="inline-block h-4 w-4 mr-2 align-middle" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                     </svg>
+                    {{ $errors->first() }}
                 </div>
-                <h1 class="text-2xl font-bold text-white">SIPIRANG</h1>
-                <p class="text-sm text-slate-400 mt-1">Panel Administrator</p>
+                @endif
+
+                {{-- Form --}}
+                <form method="POST" action="{{ route('admin.login.post') }}" class="space-y-5">
+                    @csrf
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            autocomplete="email"
+                            required
+                            placeholder="admin@sipirang.local"
+                            class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white focus:bg-white"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            required
+                            placeholder="••••••••"
+                            class="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white focus:bg-white"
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input id="remember" type="checkbox" name="remember" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-100">
+                        <label for="remember" class="text-sm text-slate-700">Ingat saya</label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg text-sm transition duration-200 ease-in-out active:scale-95 shadow-sm hover:shadow-md">
+                        Masuk ke Panel Admin
+                    </button>
+                </form>
             </div>
-
-            {{-- Error --}}
-            @if($errors->any())
-            <div class="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                {{ $errors->first() }}
-            </div>
-            @endif
-
-            {{-- Form --}}
-            <form method="POST" action="{{ route('admin.login.post') }}" class="space-y-5">
-                @csrf
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        autocomplete="email"
-                        required
-                        placeholder="admin@sipirang.local"
-                        class="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:bg-white/15 focus:ring-2 focus:ring-indigo-500/30"
-                    >
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        autocomplete="current-password"
-                        required
-                        placeholder="••••••••"
-                        class="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:bg-white/15 focus:ring-2 focus:ring-indigo-500/30"
-                    >
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <input id="remember" type="checkbox" name="remember" class="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500">
-                    <label for="remember" class="text-sm text-slate-400">Ingat saya</label>
-                </div>
-
-                <button type="submit"
-                    class="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:from-indigo-500 hover:to-violet-500 hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:scale-95">
-                    Masuk ke Panel Admin
-                </button>
-            </form>
         </div>
 
         {{-- Footer --}}
-        <p class="text-center text-xs text-slate-500 mt-6">
-            SIPIRANG &copy; {{ date('Y') }} &mdash; Sistem Peminjaman Ruangan
-        </p>
+        <div class="mt-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-0">
+            <!-- Left -->
+            <div>
+                <p class="text-xs text-slate-600">
+                    SIPIRANG &copy; {{ date('Y') }} —<br>
+                    Sistem Peminjaman Ruangan
+                </p>
+            </div>
+            
+            <!-- Right -->
+            <div class="md:text-right">
+                <p class="text-xs text-slate-600">
+                    Made with ❤️ & ☕ by <a href="https://edumc.id" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition">Reza HD</a><br>
+                    Clavis Ignoti Profundi Arcanorum
+                </p>
+            </div>
+        </div>
     </div>
 
 </body>

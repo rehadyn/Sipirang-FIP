@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin') — SIPIRANG</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
@@ -28,10 +33,8 @@
 
         {{-- Logo --}}
         <div class="flex h-16 items-center gap-3 border-b border-slate-700/50 px-5">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg">
-                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+            <div class="flex h-9 w-9 items-center justify-center">
+                <x-unm-logo class="h-8 w-8" />
             </div>
             <div>
                 <div class="text-sm font-bold text-white tracking-wider">SIPIRANG</div>
@@ -181,13 +184,24 @@
                 {{ $slot }}
             </div>
 
-            <footer class="mt-12 py-8 border-t border-slate-200/50 text-center">
-                <p class="text-xs font-medium text-slate-500">
-                    Made with ❤️ & ☕ by <a href="https://edumc.id/" target="_blank" class="inline-flex px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-600 font-bold hover:bg-indigo-100 transition-colors">REHAD</a>
-                </p>
-                <p class="text-[10px] font-mono text-slate-400 mt-2 uppercase tracking-[0.2em]">
-                    Clavis Ignoti Profundi Arcanorum
-                </p>
+            <footer class="mt-12 py-8 border-t border-slate-200/50">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-0">
+                    <!-- Left -->
+                    <div>
+                        <p class="text-xs font-medium text-slate-600">
+                            SIPIRANG &copy; {{ date('Y') }} —<br>
+                            Sistem Peminjaman Ruangan
+                        </p>
+                    </div>
+                    
+                    <!-- Right -->
+                    <div class="md:text-right">
+                        <p class="text-xs text-slate-600">
+                            Made with ❤️ & ☕ by <a href="https://edumc.id" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition">Reza HD</a><br>
+                            Clavis Ignoti Profundi Arcanorum
+                        </p>
+                    </div>
+                </div>
             </footer>
         </main>
     </div>

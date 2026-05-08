@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff">
     <title>@yield('title', 'SIPIRANG')</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
@@ -18,11 +23,7 @@
         <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div class="flex items-center gap-4">
                 <a href="{{ route('guest.bookings.rooms') }}" class="flex items-center gap-2.5">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                    </div>
+                    <x-unm-logo class="h-9 w-9" />
                     <span class="text-lg font-semibold tracking-tight text-zinc-900">SIPIRANG</span>
                 </a>
             </div>
@@ -133,14 +134,25 @@
             {{ $slot ?? '' }}
         </main>
 
-        <footer class="mt-auto border-t border-zinc-200 bg-white py-6 px-4 text-center">
-            <div class="mx-auto max-w-5xl">
-                <p class="text-xs text-zinc-500">
-                    Made with ❤️ & ☕ by <a href="https://edumc.id/" target="_blank" class="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">REHAD</a>
-                </p>
-                <p class="text-[10px] font-mono text-zinc-400 mt-1.5 uppercase tracking-[0.2em]">
-                    Clavis Ignoti Profundi Arcanorum
-                </p>
+        <footer class="mt-auto border-t border-zinc-200 bg-white py-6 px-4">
+            <div class="mx-auto max-w-6xl">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-0">
+                    <!-- Left -->
+                    <div>
+                        <p class="text-xs text-zinc-600">
+                            SIPIRANG &copy; {{ date('Y') }} —<br>
+                            Sistem Peminjaman Ruangan
+                        </p>
+                    </div>
+                    
+                    <!-- Right -->
+                    <div class="md:text-right">
+                        <p class="text-xs text-zinc-600">
+                            Made with ❤️ & ☕ by <a href="https://edumc.id" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition">Reza HD</a><br>
+                            Clavis Ignoti Profundi Arcanorum
+                        </p>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
