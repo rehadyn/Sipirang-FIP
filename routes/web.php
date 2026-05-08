@@ -162,13 +162,13 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
                 return $pdf->stream('PREVIEW_Tanda_Terima.pdf');
             }
 
-            $qrUrl = 'data:image/svg+xml;base64,' . base64_encode(
+            $qrCodeUrl = 'data:image/svg+xml;base64,' . base64_encode(
                 \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(150)
                     ->generate(url('/tracking/FIP-RNG-SAMPLE?qr=sample-preview'))
             );
 
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.approval-letter', compact(
-                'booking', 'faculty', 'university', 'phone', 'email', 'qrUrl'
+                'booking', 'faculty', 'university', 'phone', 'email', 'qrCodeUrl'
             ));
             return $pdf->stream('PREVIEW_Surat_Izin.pdf');
         })->where('type', 'receipt|approval')->name('settings.pdf-preview');
