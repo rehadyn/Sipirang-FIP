@@ -53,10 +53,14 @@
                         <td class="px-5 py-4 text-slate-600">{{ $room->capacity ? $room->capacity . ' orang' : '—' }}</td>
                         <td class="px-5 py-4">
                             <button wire:click="toggleActive({{ $room->id }})"
-                                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition
-                                    {{ $room->is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
-                                <span class="h-1.5 w-1.5 rounded-full {{ $room->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
-                                {{ $room->is_active ? 'Aktif' : 'Nonaktif' }}
+                                wire:loading.attr="disabled"
+                                wire:target="toggleActive({{ $room->id }})"
+                                title="{{ $room->is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan' }}"
+                                class="group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none
+                                    {{ $room->is_active ? 'bg-emerald-500' : 'bg-slate-300' }}">
+                                <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform duration-200
+                                    {{ $room->is_active ? 'translate-x-6' : 'translate-x-1' }}">
+                                </span>
                             </button>
                         </td>
                         <td class="px-5 py-4 text-right">

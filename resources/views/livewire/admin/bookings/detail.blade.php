@@ -111,29 +111,51 @@
 
                     {{-- KTP / Identitas (berkas awal 2) --}}
                     @if($hasKtp)
-                    <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100">
-                            <svg class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
-                            </svg>
+                    @php
+                        $ktpExt = strtolower(pathinfo($booking->ktp_file_path ?? '', PATHINFO_EXTENSION));
+                        $ktpIsImage = in_array($ktpExt, ['jpg', 'jpeg', 'png', 'webp']);
+                    @endphp
+                    <div x-data="{ previewOpen: false }" class="rounded-xl border border-slate-200 bg-slate-50 overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3">
+                            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                                <svg class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">KTP / Identitas Peminjam</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Format: {{ strtoupper($ktpExt) }} — diupload saat checkout</p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button @click="previewOpen = !previewOpen"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span x-text="previewOpen ? 'Tutup' : 'Preview'"></span>
+                                </button>
+                                <button wire:click="downloadKtp" wire:loading.attr="disabled" wire:target="downloadKtp"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition active:scale-95 disabled:opacity-60">
+                                    <svg class="h-3.5 w-3.5" wire:loading.remove wire:target="downloadKtp" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <svg class="h-3.5 w-3.5 animate-spin" wire:loading wire:target="downloadKtp" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span wire:loading.remove wire:target="downloadKtp">Unduh</span>
+                                    <span wire:loading wire:target="downloadKtp">...</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-slate-800">KTP / Identitas Peminjam</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Berkas identitas yang diupload saat checkout</p>
+                        {{-- Inline Preview --}}
+                        <div x-show="previewOpen" x-transition.opacity class="border-t border-slate-200 bg-white p-3">
+                            @if($ktpIsImage)
+                                <img src="{{ route('admin.bookings.preview', [$booking, 'ktp']) }}"
+                                    alt="KTP Peminjam"
+                                    class="max-w-full rounded-lg border border-slate-200 mx-auto block"
+                                    style="max-height: 500px; object-fit: contain;">
+                            @else
+                                <iframe src="{{ route('admin.bookings.preview', [$booking, 'ktp']) }}"
+                                    class="w-full rounded-lg"
+                                    style="height: 500px;"
+                                    title="Preview KTP">
+                                </iframe>
+                            @endif
                         </div>
-                        <button wire:click="downloadKtp"
-                            wire:loading.attr="disabled"
-                            wire:target="downloadKtp"
-                            class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition active:scale-95 disabled:opacity-60">
-                            <svg class="h-3.5 w-3.5" wire:loading.remove wire:target="downloadKtp" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                            <svg class="h-3.5 w-3.5 animate-spin" wire:loading wire:target="downloadKtp" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                            </svg>
-                            <span wire:loading.remove wire:target="downloadKtp">Unduh</span>
-                            <span wire:loading wire:target="downloadKtp">...</span>
-                        </button>
                     </div>
                     @endif
 

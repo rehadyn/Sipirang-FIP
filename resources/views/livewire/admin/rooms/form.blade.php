@@ -6,7 +6,8 @@
         <h1 class="text-2xl font-bold text-slate-900">{{ $isEditing ? 'Edit Ruangan' : 'Tambah Ruangan' }}</h1>
     </div>
 
-    <div class="max-w-2xl">
+    <div class="grid grid-cols-1 gap-6 {{ $isEditing ? 'lg:grid-cols-3' : '' }}">
+    <div class="{{ $isEditing ? 'lg:col-span-2' : 'max-w-3xl' }}">
         <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
@@ -97,9 +98,10 @@
         </div>
     </div>
 
-    {{-- Blocked Dates (hanya tampil saat edit) --}}
+    {{-- Sidebar: Blocked Dates (hanya tampil saat edit) --}}
     @if($isEditing)
-    <div class="mt-6 max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
+    <div class="lg:col-span-1">
+    <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-6 lg:sticky lg:top-6">
         <div class="flex items-center gap-2 mb-5">
             <svg class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
             <h2 class="text-sm font-semibold text-slate-700">Tanggal Diblokir</h2>
@@ -150,5 +152,7 @@
             </div>
         </div>
     </div>
+    </div>
     @endif
+    </div>
 </div>

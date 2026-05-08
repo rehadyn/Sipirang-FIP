@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-slate-900">{{ $isEditing ? 'Edit Gedung' : 'Tambah Gedung' }}</h1>
     </div>
 
-    <div class="max-w-lg">
+    <div class="max-w-xl">
         <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-6 space-y-5">
 
             <div>

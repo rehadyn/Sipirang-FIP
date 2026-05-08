@@ -4,7 +4,7 @@
         <p class="text-sm text-slate-500 mt-1">Konfigurasi umum, booking, dan dokumen PDF</p>
     </div>
 
-    <div class="space-y-6 max-w-2xl">
+    <div class="space-y-6 max-w-3xl">
 
         {{-- Pengaturan Umum --}}
         <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
