@@ -68,6 +68,29 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', \App\Livewire\Admin\Bookings\BookingList::class)->name('index');
         Route::get('/{booking}', \App\Livewire\Admin\Bookings\BookingDetail::class)->name('show');
+
+        // Inline preview untuk dokumen upload (WD2, KTP)
+        Route::get('/{booking}/preview/{type}', function (\App\Models\Booking $booking, string $type) {
+            abort_unless(in_array($type, ['letter', 'ktp'], true), 404);
+
+            if ($type === 'letter') {
+                $path = $booking->approval_letter_path;
+                $disk = 'uploads';
+                $mime = 'application/pdf';
+            } else {
+                $path = $booking->ktp_file_path;
+                $disk = 'uploads';
+                $ext  = pathinfo($path ?? '', PATHINFO_EXTENSION);
+                $mime = in_array(strtolower($ext), ['jpg','jpeg','png','webp']) ? 'image/'.$ext : 'application/pdf';
+            }
+
+            abort_if(!$path || !Storage::disk($disk)->exists($path), 404, 'File tidak ditemukan.');
+
+            return Storage::disk($disk)->response($path, basename($path), [
+                'Content-Type'        => $mime,
+                'Content-Disposition' => 'inline',
+            ]);
+        })->where('type', 'letter|ktp')->name('preview');
     });
 
     // Reports
@@ -89,6 +112,9 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::get('/create', \App\Livewire\Admin\Buildings\BuildingForm::class)->name('create');
         Route::get('/{building}/edit', \App\Livewire\Admin\Buildings\BuildingForm::class)->name('edit');
     });
+
+    // Settings
+    Route::get('/settings', \App\Livewire\Admin\Settings::class)->name('settings');
 
     // Users — Sysadmin only
     Route::prefix('users')->name('users.')->middleware(['sysadmin'])->group(function () {

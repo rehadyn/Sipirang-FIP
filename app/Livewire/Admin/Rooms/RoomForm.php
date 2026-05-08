@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Rooms;
 
-use App\Models\Room;
+use App\Models\BlockedDate;
 use App\Models\Building;
+use App\Models\Room;
 use Livewire\Component;
 
 class RoomForm extends Component
@@ -22,6 +23,10 @@ class RoomForm extends Component
     public string $rules = '';
     public bool $is_active = true;
     public int|string $sort_order = 0;
+
+    // Blocked Dates
+    public string $newBlockedDate = '';
+    public string $newBlockedReason = '';
 
     public function mount(?Room $room = null): void
     {
@@ -62,11 +67,45 @@ class RoomForm extends Component
         $this->redirectRoute('admin.rooms.index');
     }
 
+    public function addBlockedDate(): void
+    {
+        $this->validate([
+            'newBlockedDate'   => ['required', 'date', 'after_or_equal:today'],
+            'newBlockedReason' => ['nullable', 'string', 'max:255'],
+        ], [], [
+            'newBlockedDate'   => 'tanggal blokir',
+            'newBlockedReason' => 'keterangan',
+        ]);
+
+        abort_unless($this->isEditing && $this->room, 403);
+
+        BlockedDate::firstOrCreate(
+            ['room_id' => $this->room->id, 'blocked_date' => $this->newBlockedDate],
+            ['reason' => $this->newBlockedReason ?: null]
+        );
+
+        $this->newBlockedDate = '';
+        $this->newBlockedReason = '';
+        $this->room->refresh();
+    }
+
+    public function removeBlockedDate(int $id): void
+    {
+        abort_unless($this->isEditing && $this->room, 403);
+
+        BlockedDate::where('id', $id)->where('room_id', $this->room->id)->delete();
+        $this->room->refresh();
+    }
+
     public function render()
     {
-        $buildings = Building::orderBy('name')->get();
-        $roomTypes = Room::TYPES;
+        $buildings  = Building::orderBy('name')->get();
+        $roomTypes  = Room::TYPES;
+        $blockedDates = $this->isEditing
+            ? $this->room->blockedDates()->orderBy('blocked_date')->get()
+            : collect();
 
-        return view('livewire.admin.rooms.form', compact('buildings', 'roomTypes'))->layout('layouts.admin');
+        return view('livewire.admin.rooms.form', compact('buildings', 'roomTypes', 'blockedDates'))
+            ->layout('layouts.admin');
     }
 }

@@ -20,11 +20,15 @@ class BookingList extends Component
         'search'       => ['except' => ''],
         'statusFilter' => ['except' => '', 'as' => 'status'],
         'typeFilter'   => ['except' => '', 'as' => 'type'],
+        'dateFrom'     => ['except' => '', 'as' => 'from'],
+        'dateTo'       => ['except' => '', 'as' => 'to'],
     ];
 
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingStatusFilter(): void { $this->resetPage(); }
     public function updatingTypeFilter(): void { $this->resetPage(); }
+    public function updatingDateFrom(): void { $this->resetPage(); }
+    public function updatingDateTo(): void { $this->resetPage(); }
 
     public function render()
     {

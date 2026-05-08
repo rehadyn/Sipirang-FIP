@@ -7,24 +7,41 @@
     </div>
 
     {{-- Filters --}}
-    <div class="mb-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-        <div class="flex-1 min-w-48">
-            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama, tiket, WhatsApp..."
-                class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white">
+    <div class="mb-4 rounded-2xl bg-white border border-slate-200 p-4 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex-1 min-w-48">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama, tiket, WhatsApp..."
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm outline-none transition focus:border-indigo-400 focus:bg-white">
+            </div>
+            <select wire:model.live="statusFilter" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none">
+                <option value="">Semua Status</option>
+                @foreach($statusOptions as $value => $label)
+                <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+            <select wire:model.live="typeFilter" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none">
+                <option value="">Semua Tipe</option>
+                <option value="mahasiswa">Mahasiswa</option>
+                <option value="dosen">Dosen</option>
+                <option value="organisasi">Organisasi</option>
+                <option value="lainnya">Lainnya</option>
+            </select>
         </div>
-        <select wire:model.live="statusFilter" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none">
-            <option value="">Semua Status</option>
-            @foreach($statusOptions as $value => $label)
-            <option value="{{ $value }}">{{ $label }}</option>
-            @endforeach
-        </select>
-        <select wire:model.live="typeFilter" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none">
-            <option value="">Semua Tipe</option>
-            <option value="mahasiswa">Mahasiswa</option>
-            <option value="dosen">Dosen</option>
-            <option value="organisasi">Organisasi</option>
-            <option value="lainnya">Lainnya</option>
-        </select>
+        <div class="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3">
+            <span class="text-xs font-medium text-slate-500 shrink-0">Tanggal dibuat:</span>
+            <div class="flex items-center gap-2">
+                <input wire:model.live="dateFrom" type="date" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400">
+                <span class="text-slate-400 text-xs">–</span>
+                <input wire:model.live="dateTo" type="date" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400">
+            </div>
+            @if($dateFrom || $dateTo || $search || $statusFilter || $typeFilter)
+            <button wire:click="$set('dateFrom',''); $set('dateTo',''); $set('search',''); $set('statusFilter',''); $set('typeFilter','')"
+                class="text-xs font-medium text-red-600 hover:text-red-700 transition flex items-center gap-1">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Reset Filter
+            </button>
+            @endif
+        </div>
     </div>
 
     {{-- Table --}}
@@ -55,7 +72,15 @@
                             <p class="font-medium text-slate-800">{{ $booking->borrower_name }}</p>
                             <p class="text-xs text-slate-400">{{ $typeLabels[$booking->borrower_type] ?? $booking->borrower_type }}</p>
                         </td>
-                        <td class="px-5 py-4 text-slate-700">{{ $booking->items->first()?->room?->name ?? '—' }}</td>
+                        <td class="px-5 py-4 text-slate-700">
+                            @php $roomNames = $booking->items->pluck('room.name')->filter()->unique() @endphp
+                            @if($roomNames->isEmpty()) <span class="text-slate-400">—</span>
+                            @elseif($roomNames->count() === 1) {{ $roomNames->first() }}
+                            @else
+                                <span>{{ $roomNames->first() }}</span>
+                                <span class="ml-1 rounded-full bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">+{{ $roomNames->count() - 1 }}</span>
+                            @endif
+                        </td>
                         <td class="px-5 py-4 text-sm text-slate-600">{{ $booking->items->first()?->booking_date?->translatedFormat('d M Y') ?? '—' }}</td>
                         <td class="px-5 py-4">
                             <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $statusColors[$booking->status] ?? 'bg-slate-100 text-slate-600' }}">{{ $statusLabels[$booking->status] ?? $booking->status }}</span>

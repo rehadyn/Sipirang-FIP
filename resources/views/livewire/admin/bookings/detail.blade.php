@@ -16,6 +16,13 @@
         <span class="ml-auto rounded-full px-3 py-1 text-sm font-semibold {{ $statusColors[$booking->status] ?? 'bg-slate-100 text-slate-600' }}">
             {{ $statusLabels[$booking->status] ?? $booking->status }}
         </span>
+        <a href="{{ route('tracking.show', $booking->ticket_number) }}?qr={{ $booking->qr_token }}"
+           target="_blank"
+           class="ml-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+           title="Buka halaman tracking peminjam">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            Tracking
+        </a>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -132,31 +139,40 @@
 
                     {{-- Surat Persetujuan WD2 (diupload peminjam) --}}
                     @if($hasLetter)
-                    <div class="flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
-                        <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-100">
-                            <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
+                    <div x-data="{ previewOpen: false }" class="rounded-xl border border-amber-100 bg-amber-50 overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3">
+                            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-100">
+                                <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-amber-900">Surat Persetujuan WD2</p>
+                                <p class="text-xs text-amber-500 mt-0.5">Diunggah: {{ $booking->approval_letter_uploaded_at?->translatedFormat('d M Y, H:i') ?? '—' }}</p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button @click="previewOpen = !previewOpen"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 transition">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span x-text="previewOpen ? 'Tutup' : 'Preview'"></span>
+                                </button>
+                                <button wire:click="downloadApprovalLetter" wire:loading.attr="disabled" wire:target="downloadApprovalLetter"
+                                    class="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-500 transition active:scale-95 disabled:opacity-60">
+                                    <svg class="h-3.5 w-3.5" wire:loading.remove wire:target="downloadApprovalLetter" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <svg class="h-3.5 w-3.5 animate-spin" wire:loading wire:target="downloadApprovalLetter" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span wire:loading.remove wire:target="downloadApprovalLetter">Unduh</span>
+                                    <span wire:loading wire:target="downloadApprovalLetter">...</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-amber-900">Surat Persetujuan WD2</p>
-                            <p class="text-xs text-amber-500 mt-0.5">
-                                Diunggah: {{ $booking->approval_letter_uploaded_at?->translatedFormat('d M Y, H:i') ?? '—' }}
-                            </p>
+                        {{-- Inline PDF Preview --}}
+                        <div x-show="previewOpen" x-transition.opacity class="border-t border-amber-200">
+                            <iframe src="{{ route('admin.bookings.preview', [$booking, 'letter']) }}"
+                                class="w-full rounded-b-xl bg-white"
+                                style="height: 600px;"
+                                title="Preview Surat WD2">
+                            </iframe>
                         </div>
-                        <button wire:click="downloadApprovalLetter"
-                            wire:loading.attr="disabled"
-                            wire:target="downloadApprovalLetter"
-                            class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-500 transition active:scale-95 disabled:opacity-60">
-                            <svg class="h-3.5 w-3.5" wire:loading.remove wire:target="downloadApprovalLetter" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                            <svg class="h-3.5 w-3.5 animate-spin" wire:loading wire:target="downloadApprovalLetter" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                            </svg>
-                            <span wire:loading.remove wire:target="downloadApprovalLetter">Unduh</span>
-                            <span wire:loading wire:target="downloadApprovalLetter">...</span>
-                        </button>
                     </div>
                     @endif
 

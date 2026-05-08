@@ -9,15 +9,15 @@
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-6">
         @php
         $statCards = [
-            ['label' => 'Total Booking', 'value' => $stats['total'], 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'bg' => 'bg-indigo-50', 'icon_c' => 'text-indigo-600', 'val_c' => 'text-indigo-700'],
-            ['label' => 'Menunggu Review', 'value' => $stats['pending_review'], 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'bg' => 'bg-amber-50', 'icon_c' => 'text-amber-600', 'val_c' => 'text-amber-700'],
-            ['label' => 'Disetujui', 'value' => $stats['approved'], 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'bg' => 'bg-emerald-50', 'icon_c' => 'text-emerald-600', 'val_c' => 'text-emerald-700'],
-            ['label' => 'Ditolak', 'value' => $stats['rejected'], 'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z', 'bg' => 'bg-red-50', 'icon_c' => 'text-red-600', 'val_c' => 'text-red-700'],
+            ['label' => 'Total Booking',     'value' => $stats['total'],          'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'bg' => 'bg-indigo-50', 'icon_c' => 'text-indigo-600', 'val_c' => 'text-indigo-700', 'href' => route('admin.bookings.index')],
+            ['label' => 'Menunggu Review',   'value' => $stats['pending_review'], 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',                                                                                     'bg' => 'bg-amber-50',   'icon_c' => 'text-amber-600',   'val_c' => 'text-amber-700',  'href' => route('admin.bookings.index').'?status=pending_review'],
+            ['label' => 'Disetujui',         'value' => $stats['approved'],       'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',                                                                                   'bg' => 'bg-emerald-50', 'icon_c' => 'text-emerald-600', 'val_c' => 'text-emerald-700','href' => route('admin.bookings.index').'?status=approved'],
+            ['label' => 'Ditolak',           'value' => $stats['rejected'],       'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',                                                           'bg' => 'bg-red-50',     'icon_c' => 'text-red-600',     'val_c' => 'text-red-700',    'href' => route('admin.bookings.index').'?status=rejected'],
         ];
         @endphp
 
         @foreach($statCards as $card)
-        <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm transition hover:shadow-md">
+        <a href="{{ $card['href'] }}" class="rounded-2xl bg-white border border-slate-200 p-5 shadow-sm transition hover:shadow-md hover:border-indigo-200 block">
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">{{ $card['label'] }}</p>
@@ -29,7 +29,7 @@
                     </svg>
                 </div>
             </div>
-        </div>
+        </a>
         @endforeach
     </div>
 
@@ -43,14 +43,14 @@
             <p class="text-xs text-slate-500">Bulan Ini</p>
             <p class="text-2xl font-bold text-slate-700 mt-1">{{ $stats['this_month'] }}</p>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+        <a href="{{ route('admin.bookings.index') }}?status=pending_upload" class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-indigo-200 transition block">
             <p class="text-xs text-slate-500">Menunggu Upload</p>
             <p class="text-2xl font-bold text-slate-700 mt-1">{{ $stats['pending_upload'] }}</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+        </a>
+        <a href="{{ route('admin.rooms.index') }}" class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-indigo-200 transition block">
             <p class="text-xs text-slate-500">Ruangan Aktif</p>
             <p class="text-2xl font-bold text-slate-700 mt-1">{{ $activeRooms }} / {{ $totalRooms }}</p>
-        </div>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
