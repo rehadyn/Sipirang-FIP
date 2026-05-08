@@ -18,10 +18,12 @@ class PDFService
     public function generateBookingReceipt(Booking $booking): string
     {
         $pdf = Pdf::loadView('pdfs.booking-receipt', [
-            'booking' => $booking,
-            'faculty' => $this->settingHelper->get('general.faculty_name', 'FIP UNM'),
-            'university' => $this->settingHelper->get('general.university_name', 'UNM'),
-            'deadline_hours' => $this->settingHelper->get('booking.deadline_hours', 24),
+            'booking'        => $booking,
+            'faculty'        => $this->settingHelper->get('general.faculty_name', 'FIP UNM'),
+            'university'     => $this->settingHelper->get('general.university_name', 'UNM'),
+            'phone'          => $this->settingHelper->get('general.phone', ''),
+            'email'          => $this->settingHelper->get('general.email', ''),
+            'deadline_hours' => $this->settingHelper->get('booking.deadline_hours', 5),
         ]);
 
         $filename = "BUKTI_BOOKING_{$booking->ticket_number}.pdf";
@@ -39,10 +41,12 @@ class PDFService
     public function generateApprovalPDF(Booking $booking): string
     {
         $pdf = Pdf::loadView('pdfs.approval-letter', [
-            'booking' => $booking,
-            'faculty' => $this->settingHelper->get('general.faculty_name', 'FIP UNM'),
+            'booking'    => $booking,
+            'faculty'    => $this->settingHelper->get('general.faculty_name', 'FIP UNM'),
             'university' => $this->settingHelper->get('general.university_name', 'UNM'),
-            'qrCodeUrl' => $this->generateQRCode($booking->qr_token),
+            'phone'      => $this->settingHelper->get('general.phone', ''),
+            'email'      => $this->settingHelper->get('general.email', ''),
+            'qrCodeUrl'  => $this->generateQRCode($booking->qr_token),
         ]);
 
         $filename = "SURAT_IZIN_{$booking->ticket_number}.pdf";

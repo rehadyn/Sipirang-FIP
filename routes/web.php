@@ -149,13 +149,15 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             ]);
             $booking->setRelation('items', collect([$item]));
 
-            $faculty      = \App\Helpers\SettingHelper::get('general.faculty_name', 'FIP UNM');
-            $university   = \App\Helpers\SettingHelper::get('general.university_name', 'UNM');
+            $faculty       = \App\Helpers\SettingHelper::get('general.faculty_name', 'FIP UNM');
+            $university    = \App\Helpers\SettingHelper::get('general.university_name', 'UNM');
+            $phone         = \App\Helpers\SettingHelper::get('general.phone', '');
+            $email         = \App\Helpers\SettingHelper::get('general.email', '');
             $deadlineHours = \App\Helpers\SettingHelper::get('booking.deadline_hours', 5);
 
             if ($type === 'receipt') {
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.booking-receipt', compact(
-                    'booking', 'faculty', 'university', 'deadlineHours'
+                    'booking', 'faculty', 'university', 'phone', 'email'
                 ) + ['deadline_hours' => $deadlineHours]);
                 return $pdf->stream('PREVIEW_Tanda_Terima.pdf');
             }
@@ -166,7 +168,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             );
 
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.approval-letter', compact(
-                'booking', 'faculty', 'university', 'qrUrl'
+                'booking', 'faculty', 'university', 'phone', 'email', 'qrUrl'
             ));
             return $pdf->stream('PREVIEW_Surat_Izin.pdf');
         })->where('type', 'receipt|approval')->name('settings.pdf-preview');

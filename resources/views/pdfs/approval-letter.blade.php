@@ -53,8 +53,8 @@
     <div class="header">
         <h2>{{ strtoupper($university ?? 'UNIVERSITAS NEGERI MAKASSAR') }}</h2>
         <h1>{{ strtoupper($faculty ?? 'FAKULTAS ILMU PENDIDIKAN') }}</h1>
-        <p>Alamat: Kampus UNM Tidung, Jl. Tamalate 1, Makassar. Telp: (0411) 883076</p>
-        <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span> | Email: fip@unm.ac.id</p>
+        <p>Alamat: Kampus UNM Tidung, Jl. Tamalate 1, Makassar.{{ !empty($phone) ? ' Telp: ' . $phone : '' }}</p>
+        <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span>{{ !empty($email) ? ' | Email: ' . $email : '' }}</p>
     </div>
 
     <div class="title-section">
@@ -133,8 +133,8 @@
     <div class="header">
         <h2>{{ strtoupper($university ?? 'UNIVERSITAS NEGERI MAKASSAR') }}</h2>
         <h1>{{ strtoupper($faculty ?? 'FAKULTAS ILMU PENDIDIKAN') }}</h1>
-        <p>Alamat: Kampus UNM Tidung, Jl. Tamalate 1, Makassar. Telp: (0411) 883076</p>
-        <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span> | Email: fip@unm.ac.id</p>
+        <p>Alamat: Kampus UNM Tidung, Jl. Tamalate 1, Makassar.{{ !empty($phone) ? ' Telp: ' . $phone : '' }}</p>
+        <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span>{{ !empty($email) ? ' | Email: ' . $email : '' }}</p>
     </div>
 
     <div class="terms-title">
