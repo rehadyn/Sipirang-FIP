@@ -1,308 +1,338 @@
-# SIPIRANG — Sistem Peminjaman Ruangan FIP UNM
+<div align="center">
 
-Aplikasi web untuk pengelolaan peminjaman ruangan di Fakultas Ilmu Pendidikan, Universitas Negeri Makassar. Mahasiswa dan dosen dapat mengajukan peminjaman tanpa akun, mengunggah surat persetujuan WD 2, dan mengunduh surat izin resmi ber-QR Code setelah disetujui admin.
+# SIPIRANG
+### Sistem Peminjaman Ruangan — Fakultas Ilmu Pendidikan, UNM
+
+[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Livewire](https://img.shields.io/badge/Livewire-3.x-FB70A9?style=flat-square)](https://livewire.laravel.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+Platform peminjaman ruangan berbasis web untuk civitas akademika FIP UNM —
+tanpa akun, tanpa kerumitan, dengan surat izin resmi ber-QR Code.
+
+</div>
 
 ---
 
 ## Daftar Isi
 
-- [Fitur Utama](#fitur-utama)
-- [Stack Teknologi](#stack-teknologi)
-- [Persyaratan Sistem](#persyaratan-sistem)
-- [Instalasi](#instalasi)
-- [Konfigurasi Tambahan](#konfigurasi-tambahan)
-- [Akun Default](#akun-default)
-- [Menjalankan Scheduler (Auto-expire Booking)](#menjalankan-scheduler-auto-expire-booking)
-- [Operasional Harian](#operasional-harian)
-- [Update dari GitHub](#update-dari-github)
-- [Troubleshooting](#troubleshooting)
-- [Struktur Proyek](#struktur-proyek)
+- [Fitur Utama](#-fitur-utama)
+- [Stack Teknologi](#-stack-teknologi)
+- [Persyaratan Sistem](#-persyaratan-sistem)
+- [Instalasi Cepat](#-instalasi-cepat)
+- [Konfigurasi](#-konfigurasi)
+- [Akun Default](#-akun-default)
+- [Menjalankan Scheduler](#-menjalankan-scheduler)
+- [Struktur Proyek](#-struktur-proyek)
+- [Alur Penggunaan](#-alur-penggunaan)
+- [Update & Deploy](#-update--deploy)
+- [Troubleshooting](#-troubleshooting)
+- [Panduan Best Practice](#-panduan-best-practice)
 
 ---
 
-## Fitur Utama
+## ✨ Fitur Utama
 
-- **Pengajuan tanpa akun** — Mahasiswa/dosen langsung pilih ruangan dan ajukan tanpa registrasi.
-- **Multi-jadwal** — Satu pengajuan dapat memuat beberapa ruangan pada tanggal berbeda.
-- **Live status ruangan** — Tampilan real-time slot Pagi/Siang/Fullday per tanggal.
-- **Filter & pencarian** — Cari ruangan berdasarkan nama, kode, atau gedung.
-- **Auto-expire** — Booking yang tidak meng-upload surat dalam 5 jam dibatalkan otomatis.
-- **Dokumen digital** — Tanda terima dan surat izin resmi ber-QR Code di-generate otomatis dalam PDF.
-- **QR aman** — QR di surat izin terikat token unik, tidak bisa dipalsukan untuk tiket lain.
-- **Tracking real-time** — Peminjam pantau status melalui nomor tiket + WhatsApp atau scan QR.
-- **Panel admin** — Dashboard, kelola booking, ruangan, gedung, laporan bulanan (Excel).
-
----
-
-## Stack Teknologi
-
-| Komponen | Versi |
+### Untuk Peminjam (Mahasiswa / Dosen / Organisasi)
+| Fitur | Keterangan |
 |---|---|
-| PHP | ≥ 8.3 |
-| Laravel | 13.x |
-| Livewire | 3.x |
-| Filament | 5.x (admin panel) |
-| Database | SQLite (default) atau MySQL/PostgreSQL |
-| Frontend | Tailwind CSS 4, Alpine.js, Vite |
-| PDF | barryvdh/laravel-dompdf |
-| QR Code | simplesoftwareio/simple-qrcode |
-| Excel | phpoffice/phpspreadsheet |
+| **Tanpa Akun** | Ajukan peminjaman langsung tanpa registrasi |
+| **Live Status Ruangan** | Lihat ketersediaan slot Pagi / Siang / Fullday secara real-time |
+| **Pencarian & Filter** | Cari ruangan berdasarkan nama, kode, atau gedung |
+| **Multi-jadwal** | Satu pengajuan memuat banyak ruangan di berbagai tanggal |
+| **PDF Tanda Terima** | Otomatis terunduh setelah konfirmasi booking |
+| **Tracking Real-time** | Pantau status via nomor tiket + WhatsApp, atau scan QR |
+| **Surat Izin Digital** | PDF resmi ber-QR Code diterbitkan otomatis saat disetujui |
+
+### Untuk Admin / Pengelola
+| Fitur | Keterangan |
+|---|---|
+| **Dashboard** | Ringkasan statistik, antrian review, alert SLA |
+| **Review Inline** | Preview surat WD 2 langsung di halaman tanpa download |
+| **Approve / Reject** | Satu klik dengan catatan; PDF surat izin + QR otomatis dibuat |
+| **Kelola Ruangan** | Toggle aktif/nonaktif, blokir tanggal tertentu |
+| **Laporan Excel** | Export laporan bulanan booking |
+| **Pengaturan Sistem** | Konfigurasi nama institusi, deadline, maks slot (sysadmin only) |
+| **Preview PDF Test** | Uji template PDF dengan data dummy dari halaman pengaturan |
+
+### Keamanan & Teknis
+- QR Code di surat izin terikat token unik per booking — tidak bisa dipalsukan
+- Auto-expire booking: slot dilepas otomatis jika surat tidak diupload tepat waktu
+- Scheduler `bookings:expire` berjalan setiap menit via Laravel Schedule
+- Semua file dokumen disimpan di disk private (tidak bisa diakses langsung via URL)
 
 ---
 
-## Persyaratan Sistem
+## 🛠 Stack Teknologi
 
-Sebelum instalasi, pastikan tersedia:
+| Layer | Teknologi | Versi |
+|---|---|---|
+| Runtime | PHP | ≥ 8.3 |
+| Framework | Laravel | 13.x |
+| Reaktivitas UI | Livewire | 3.x |
+| Admin Panel | Filament | 5.x |
+| Frontend | Tailwind CSS + Alpine.js | 4.x / 3.x |
+| Build Tool | Vite | latest |
+| Database | SQLite *(default)* / MySQL / PostgreSQL | — |
+| PDF | barryvdh/laravel-dompdf | ^3.1 |
+| QR Code | simplesoftwareio/simple-qrcode | ^4.2 |
+| Excel | phpoffice/phpspreadsheet | ^5.7 |
 
-- **PHP** 8.3 atau lebih baru, dengan ekstensi: `BCMath`, `Ctype`, `cURL`, `DOM`, `Fileinfo`, `JSON`, `Mbstring`, `OpenSSL`, `PCRE`, `PDO`, `Tokenizer`, `XML`, `GD`, `Zip`, `SQLite3` (atau driver database pilihan)
-- **Composer** 2.x — [getcomposer.org](https://getcomposer.org/)
-- **Node.js** 20 LTS atau lebih baru, dengan **npm**
+---
+
+## 💻 Persyaratan Sistem
+
+- **PHP** ≥ 8.3 dengan ekstensi: `BCMath` `Ctype` `cURL` `DOM` `Fileinfo` `GD` `JSON` `Mbstring` `OpenSSL` `PDO` `Tokenizer` `XML` `Zip` `SQLite3`
+- **Composer** 2.x → [getcomposer.org](https://getcomposer.org)
+- **Node.js** ≥ 20 LTS + npm
 - **Git**
-- (Opsional) **Laravel Herd** — direkomendasikan untuk Windows/macOS karena sudah membundle PHP, Nginx, dan custom domain `*.test`
+- *(Rekomendasi)* **Laravel Herd** untuk development di Windows/macOS
 
 ---
 
-## Instalasi
-
-### 1. Clone repository
+## 🚀 Instalasi Cepat
 
 ```bash
+# 1. Clone
 git clone https://github.com/rehadyn/Sipirang-FIP.git sipirang
 cd sipirang
-```
 
-### 2. Install dependency PHP
-
-```bash
+# 2. Dependency
 composer install
-```
+npm install
 
-### 3. Salin file environment
-
-```bash
-# Linux / macOS
+# 3. Environment
 cp .env.example .env
-
-# Windows (PowerShell)
-Copy-Item .env.example .env
-```
-
-### 4. Generate application key
-
-```bash
 php artisan key:generate
+
+# 4. Database (SQLite — paling cepat)
+# Windows:
+New-Item -ItemType File -Path database/database.sqlite -Force
+# Linux/macOS:
+touch database/database.sqlite
+
+# 5. Migrasi & seeder
+php artisan migrate --seed
+
+# 6. Storage link
+php artisan storage:link
+
+# 7. Build asset
+npm run build
+
+# 8. Jalankan (development)
+php artisan serve
 ```
 
-### 5. Atur konfigurasi `.env`
+> Akses di [http://127.0.0.1:8000](http://127.0.0.1:8000)
+> Admin panel di [http://127.0.0.1:8000/admin/login](http://127.0.0.1:8000/admin/login)
 
-Buka file `.env`, sesuaikan minimal:
+---
+
+## ⚙️ Konfigurasi
+
+### File `.env` — Wajib Disesuaikan
 
 ```env
 APP_NAME=SIPIRANG
-APP_ENV=production            # gunakan "local" saat development
-APP_DEBUG=false               # gunakan "true" saat development
-APP_URL=http://sipirang.test  # samakan dengan URL Anda akan akses
+APP_ENV=production          # local saat development
+APP_DEBUG=false             # true saat development
+APP_URL=http://sipirang.test  # ⚠️ harus benar — dipakai untuk QR Code
 
 APP_LOCALE=id
 APP_TIMEZONE=Asia/Makassar
 ```
 
-> **Penting:** `APP_URL` harus sesuai dengan URL aktual karena dipakai untuk men-generate QR Code di surat izin. Jika salah, QR yang di-scan dari handphone tidak akan terbuka.
+> **Peringatan `APP_URL`:** Nilai ini langsung masuk ke QR Code pada surat izin.
+> Jika salah, QR Code yang discan tidak akan terbuka. Setelah ubah `.env`,
+> jalankan `php artisan config:clear`.
 
-### 6. Siapkan database
+### Pengaturan Sistem (via UI Admin)
 
-**Pilihan A — SQLite (default, paling mudah):**
+Setelah login sebagai **sysadmin**, buka `Admin → Pengaturan`:
 
-```bash
-# Linux / macOS
-touch database/database.sqlite
-
-# Windows (PowerShell)
-New-Item -ItemType File -Path database/database.sqlite -Force
-```
-
-`.env` sudah default `DB_CONNECTION=sqlite`, tidak perlu diubah.
-
-**Pilihan B — MySQL/MariaDB:**
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=sipirang
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-Buat database `sipirang` di MySQL terlebih dahulu sebelum lanjut.
-
-### 7. Jalankan migrasi & seeder
-
-```bash
-php artisan migrate --seed
-```
-
-Perintah ini akan:
-- Membuat seluruh tabel
-- Membuat akun **sysadmin** dan **admin** default
-- Mengisi data awal: gedung, ruangan, fasilitas, dan setting sistem
-
-### 8. Buat symbolic link untuk storage publik
-
-```bash
-php artisan storage:link
-```
-
-### 9. Install dependency frontend & build asset
-
-```bash
-npm install
-npm run build
-```
-
-### 10. Jalankan aplikasi
-
-**Development (built-in server):**
-
-```bash
-php artisan serve
-```
-
-Akses di `http://127.0.0.1:8000`.
-
-**Laravel Herd:**
-
-Pastikan domain `sipirang.test` sudah ditautkan ke folder proyek di Herd, lalu akses langsung di `http://sipirang.test`.
-
----
-
-## Konfigurasi Tambahan
-
-### Pengaturan Sistem
-
-Setelah login admin, atur konfigurasi berikut di **Admin → Pengaturan**:
-
-- **Nama Fakultas** dan **Universitas** (muncul di header PDF surat izin)
-- **Nomor WhatsApp Admin** (untuk tombol "Hubungi Admin")
-- **Deadline upload** (default 5 jam)
-
-### Email & Notifikasi
-
-Aplikasi tidak mengirim email/notifikasi keluar. Komunikasi dengan peminjam dilakukan via WhatsApp manual oleh admin.
-
----
-
-## Akun Default
-
-Setelah seeder dijalankan, dua akun ini tersedia:
-
-| Role | Email | Password |
+| Setting | Default | Keterangan |
 |---|---|---|
-| **Sysadmin** | `sysadmin@sipirang.local` | `sipirang123` |
-| **Admin** | `admin@sipirang.local` | `sipirang123` |
-
-**Wajib ganti password setelah login pertama** melalui menu profil admin.
-
-Login admin di: `<APP_URL>/admin/login`
+| Nama Fakultas | — | Muncul di header semua PDF |
+| Nama Universitas | — | Muncul di header semua PDF |
+| No. Telepon Fakultas | — | Muncul di PDF & tombol WA admin |
+| Email Fakultas | — | Muncul di header PDF |
+| Batas Waktu Upload | `24` jam | Booking expired jika surat belum diupload |
+| Maks. Slot per Booking | `5` | Maksimal ruangan×sesi per pengajuan |
+| Maks. Hari ke Depan | `30` | Batas tanggal yang bisa dipesan |
 
 ---
 
-## Menjalankan Scheduler (Auto-expire Booking)
+## 👤 Akun Default
 
-Booking yang tidak diunggahi surat dalam 5 jam akan **otomatis dibatalkan** oleh scheduler. Scheduler ini wajib aktif agar slot ruangan tidak tertahan oleh peminjam yang menelantarkan pengajuannya.
+Seeder membuat dua akun siap pakai:
 
-Pilih salah satu cara di bawah sesuai lingkungan server:
+| Role | Email | Password | Akses |
+|---|---|---|---|
+| **Sysadmin** | `sysadmin@sipirang.local` | `sipirang123` | Semua fitur termasuk Pengaturan & Users |
+| **Admin** | `admin@sipirang.local` | `sipirang123` | Kelola booking, ruangan, laporan |
 
-### Server Linux (production)
+> **Ganti password setelah login pertama** melalui menu profil.
+>
+> Login admin: `{APP_URL}/admin/login`
 
-Tambahkan ke crontab user yang menjalankan aplikasi:
+---
 
+## ⏰ Menjalankan Scheduler
+
+Scheduler **wajib aktif** agar booking yang melewati batas waktu upload otomatis dibatalkan dan slot ruangan dilepas kembali.
+
+### Linux / Server Production
 ```bash
 crontab -e
-```
-
-Lalu tambahkan baris:
-
-```cron
+# Tambahkan:
 * * * * * cd /path/ke/sipirang && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ### Laravel Herd (Windows / macOS)
-
-Buka aplikasi Herd → tab **Services / Scheduled Tasks** → enable scheduler untuk site `sipirang`.
+Buka Herd → **Services** atau **Scheduled Tasks** → aktifkan scheduler untuk site `sipirang`.
 
 ### Windows Server (Task Scheduler)
-
-Buat task baru yang berjalan setiap menit dengan action:
-
 ```
-Program: C:\path\to\php.exe
-Arguments: artisan schedule:run
-Start in: C:\path\to\sipirang
+Program : C:\path\php.exe
+Argumen : artisan schedule:run
+Start in: C:\path\sipirang
+Interval: Setiap 1 menit
 ```
 
-### Development / testing manual
-
-Jalankan di terminal terpisah (proses ini berjalan terus selama terminal terbuka):
-
+### Development / Testing
 ```bash
-php artisan schedule:work
+php artisan schedule:work   # berjalan terus di terminal
 ```
 
-### Verifikasi scheduler berjalan
-
+### Verifikasi
 ```bash
 php artisan schedule:list
+# Harus muncul: bookings:expire  *  *  *  *  *
 ```
 
-Harus menampilkan task `bookings:expire` dengan jadwal `* * * * *` (setiap menit).
+---
+
+## 📁 Struktur Proyek
+
+```
+sipirang/
+├── app/
+│   ├── Console/Commands/
+│   │   └── ExpireBookings.php        # Auto-cancel booking kedaluwarsa
+│   ├── Helpers/
+│   │   └── SettingHelper.php         # Baca/tulis pengaturan sistem
+│   ├── Http/Middleware/
+│   │   ├── AdminMiddleware.php
+│   │   └── SysadminMiddleware.php
+│   ├── Livewire/
+│   │   ├── Admin/                    # Komponen panel admin
+│   │   │   ├── Dashboard.php
+│   │   │   ├── Settings.php          # Sysadmin only
+│   │   │   ├── Bookings/
+│   │   │   ├── Rooms/
+│   │   │   ├── Buildings/
+│   │   │   ├── Reports/
+│   │   │   └── Users/
+│   │   └── Guest/                    # Halaman publik
+│   │       ├── LiveBoard.php         # Pilih ruangan real-time
+│   │       ├── Checkout.php
+│   │       ├── Tracking.php
+│   │       └── Guide.php
+│   ├── Models/
+│   │   ├── Booking.php               # Status constants, deadline, QR token
+│   │   ├── BookingItem.php           # Per-slot booking
+│   │   ├── Room.php                  # Operating hours, blocked dates
+│   │   ├── Building.php
+│   │   ├── BlockedDate.php
+│   │   └── Setting.php
+│   └── Services/
+│       ├── BookingService.php        # Create, approve, reject, expire
+│       ├── PDFService.php            # Generate receipt & approval letter
+│       └── FileStorageService.php
+│
+├── resources/views/
+│   ├── layouts/
+│   │   ├── guest.blade.php           # Layout halaman publik
+│   │   └── admin.blade.php           # Layout panel admin (sidebar)
+│   ├── livewire/
+│   │   ├── guest/                    # View komponen guest
+│   │   └── admin/                    # View komponen admin
+│   └── pdfs/
+│       ├── booking-receipt.blade.php # PDF Tanda Terima Booking
+│       └── approval-letter.blade.php # PDF Surat Izin (2 halaman)
+│
+├── routes/
+│   ├── web.php                       # Guest + Admin routes
+│   └── console.php                   # Schedule: bookings:expire tiap menit
+│
+├── storage/app/
+│   ├── bookings/                     # PDF receipt & surat izin (public disk)
+│   └── uploads/                      # KTP & surat WD 2 (private disk)
+│
+├── PANDUAN_PEMINJAMAN.md             # SOP & best practice penggunaan
+└── README.md
+```
 
 ---
 
-## Operasional Harian
+## 🔄 Alur Penggunaan
 
-### Cek booking aktif
+### Alur Peminjam (Singkat)
 
-`<APP_URL>/admin/bookings` — daftar semua pengajuan dengan filter status.
+```
+1. Pilih Ruangan  →  2. Checkout  →  3. Upload Surat WD 2  →  4. Tunggu Review  →  5. Unduh Surat Izin
+```
 
-### Approve / reject booking
+### Status Booking
 
-Buka detail booking → tombol **Setujui** atau **Tolak**. Saat disetujui, surat izin PDF + QR akan otomatis di-generate.
+```
+pending_upload  →  (upload surat)  →  pending_review
+                                            ↓
+                          approved  ←  [Admin review]  →  rejected
+                              ↓
+                     PDF Surat Izin + QR terbit otomatis
+```
 
-### Laporan bulanan
+| Status | Artinya |
+|---|---|
+| `pending_upload` | Booking baru, menunggu upload surat WD 2 |
+| `pending_review` | Surat sudah diupload, menunggu keputusan admin |
+| `approved` | Disetujui — surat izin + QR tersedia |
+| `rejected` | Ditolak — lihat alasan di halaman tracking |
+| `expired` | Batas waktu upload terlewati, booking dibatalkan otomatis |
 
-`<APP_URL>/admin/reports` — unduh laporan bulanan dalam format Excel.
+### Dokumen yang Dihasilkan
 
-### Mengelola ruangan & gedung
-
-- Ruangan: `<APP_URL>/admin/rooms`
-- Gedung: `<APP_URL>/admin/buildings`
-
-Atur nama, kode, lantai, kapasitas, tipe, dan apakah ruangan **memerlukan upload KTP**.
-
-### Memblokir tanggal tertentu
-
-Untuk libur atau acara fakultas, admin dapat memblokir tanggal tertentu sehingga ruangan tidak bisa di-booking pada hari tersebut. Atur via halaman detail ruangan.
+| Dokumen | Kapan Dibuat | Isi |
+|---|---|---|
+| **Tanda Terima Booking** | Saat booking dibuat | Nomor tiket, detail peminjam, jadwal ruangan, batas waktu upload |
+| **Surat Izin Penggunaan Ruangan** | Saat admin approve | Detail booking, catatan admin, QR verifikasi + halaman syarat & sanksi |
 
 ---
 
-## Update dari GitHub
-
-Saat ada perubahan baru:
+## 🚢 Update & Deploy
 
 ```bash
+# Tarik perubahan terbaru
 git pull origin main
+
+# Update dependency
 composer install --no-dev --optimize-autoloader
+npm install && npm run build
+
+# Jalankan migrasi jika ada
 php artisan migrate --force
-npm install
-npm run build
+
+# Bersihkan cache
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 ```
 
-Setelah deploy production, jangan lupa cache ulang:
+**Untuk production** — cache ulang setelah deploy:
 
 ```bash
 php artisan config:cache
@@ -312,86 +342,67 @@ php artisan view:cache
 
 ---
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### QR Code di surat izin mengarah ke `localhost`
-
-Penyebab: `APP_URL` di `.env` masih default. Solusi:
-
-1. Edit `.env` → set `APP_URL` ke domain produksi (mis. `https://sipirang.fip.unm.ac.id`).
-2. `php artisan config:clear`
-3. Generate ulang surat izin yang sudah ada (approve ulang booking, atau jalankan tinker untuk regenerate).
-
-### "404 Not Found" saat unduh PDF dari halaman tracking
-
-PDF di-stream lewat route `/tracking/{tiket}/pdf/{type}`, bukan link langsung ke storage. Pastikan:
-
-- `php artisan storage:link` sudah dijalankan.
-- File ada di `storage/app/bookings/...` (cek lewat file manager).
-- Booking memang sudah punya `booking_pdf_path` / `approval_pdf_path` di database.
-
-### Booking tidak otomatis expired
-
-Cek scheduler aktif: `php artisan schedule:list`. Jika tidak ada task `bookings:expire`, lihat bagian [Menjalankan Scheduler](#menjalankan-scheduler-auto-expire-booking).
-
-### Asset CSS/JS tidak muncul setelah deploy
-
-Asset belum di-build:
-
+`APP_URL` di `.env` masih default. Perbaiki:
 ```bash
-npm install
-npm run build
+# Edit .env: APP_URL=https://domain-anda.ac.id
+php artisan config:clear
+```
+Lalu approve ulang booking agar PDF baru ter-generate dengan URL yang benar.
+
+### PDF tidak bisa dibuka / 404
+File di-serve via route `/tracking/{tiket}/pdf/{type}` — tidak bergantung pada symlink.
+Pastikan file ada di `storage/app/bookings/...` (cek file manager).
+
+### Booking tidak expired otomatis
+Scheduler tidak aktif. Cek: `php artisan schedule:list`
+Lihat [Menjalankan Scheduler](#-menjalankan-scheduler) untuk setup.
+
+### Pengaturan sistem tidak berpengaruh
+Kemungkinan cache masih menyimpan nilai lama. Jalankan:
+```bash
+php artisan cache:clear
 ```
 
-Untuk development jalankan `npm run dev` di terminal terpisah.
-
-### Error "permission denied" pada `storage/` atau `bootstrap/cache/`
-
-Linux:
-
+### Asset CSS/JS tidak tampil
 ```bash
+npm install && npm run build
+```
+
+### Error permission `storage/` atau `bootstrap/cache/`
+```bash
+# Linux
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
-(Sesuaikan user dengan owner web server Anda — `nginx`, `apache`, dll.)
-
-### Database SQLite "database is locked"
-
-Pastikan hanya satu proses menulis ke `database/database.sqlite`. Untuk produksi dengan banyak user bersamaan, sebaiknya migrasi ke MySQL/PostgreSQL.
+### SQLite "database is locked"
+Terjadi saat banyak concurrent write. Untuk production dengan banyak pengguna, migrasi ke **MySQL** atau **PostgreSQL**.
 
 ---
 
-## Struktur Proyek
+## 📖 Panduan Best Practice
 
-```
-sipirang/
-├── app/
-│   ├── Console/Commands/      # bookings:expire (auto-cancel)
-│   ├── Http/Controllers/      # Controller admin
-│   ├── Livewire/              # Komponen Livewire (guest & admin)
-│   ├── Models/                # Booking, Room, Building, dll
-│   └── Services/              # BookingService, PDFService, dll
-├── database/
-│   ├── migrations/
-│   └── seeders/               # Data awal
-├── resources/
-│   └── views/
-│       ├── livewire/          # View komponen Livewire
-│       ├── pdfs/              # Template PDF (booking-receipt, approval-letter)
-│       ├── home.blade.php     # Landing page
-│       └── layouts/
-├── routes/
-│   ├── web.php                # Route guest & admin
-│   └── console.php            # Schedule tasks
-└── storage/app/
-    ├── bookings/              # PDF tanda terima & surat izin
-    └── uploads/                # KTP & surat WD 2 yang di-upload
-```
+Lihat [PANDUAN_PEMINJAMAN.md](PANDUAN_PEMINJAMAN.md) untuk:
+- Alur lengkap peminjam (6 langkah detail)
+- Checklist harian admin
+- Diagram alur sistem
+- Tabel status & batas waktu
+- Do & Don't untuk peminjam dan admin
+- FAQ 9 pertanyaan umum
 
 ---
 
-## Lisensi
+## 📄 Lisensi
 
-Proyek internal Fakultas Ilmu Pendidikan, Universitas Negeri Makassar.
-Dikembangkan oleh [REHAD](https://edumc.id).
+Proyek internal — Fakultas Ilmu Pendidikan, Universitas Negeri Makassar.
+
+<div align="center">
+
+Made with ❤️ & ☕ by **[REHAD](https://edumc.id)**
+
+*Clavis Ignoti Profundi Arcanorum*
+
+</div>
