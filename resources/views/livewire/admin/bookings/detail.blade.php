@@ -37,7 +37,19 @@
                     <div><p class="text-slate-400 text-xs">Nama</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_name }}</p></div>
                     <div><p class="text-slate-400 text-xs">No. Identitas</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_id_number }}</p></div>
                     <div><p class="text-slate-400 text-xs">Tipe</p><p class="font-medium text-slate-800 mt-0.5 capitalize">{{ $booking->borrower_type }}</p></div>
-                    <div><p class="text-slate-400 text-xs">WhatsApp</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_whatsapp }}</p></div>
+                    <div>
+                        <p class="text-slate-400 text-xs">WhatsApp</p>
+                        @php
+                            $wa = preg_replace('/[^0-9]/', '', $booking->borrower_whatsapp ?? '');
+                            if (str_starts_with($wa, '0')) $wa = '62' . substr($wa, 1);
+                            elseif (!str_starts_with($wa, '62')) $wa = '62' . $wa;
+                        @endphp
+                        <a href="https://wa.me/{{ $wa }}" target="_blank"
+                           class="font-medium text-indigo-600 hover:underline mt-0.5 inline-flex items-center gap-1 text-sm">
+                            {{ $booking->borrower_whatsapp }}
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
                     @if($booking->borrower_major)<div><p class="text-slate-400 text-xs">Jurusan</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_major }}</p></div>@endif
                     @if($booking->borrower_subject)<div><p class="text-slate-400 text-xs">Mata Kuliah</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_subject }}</p></div>@endif
                     @if($booking->borrower_organization)<div><p class="text-slate-400 text-xs">Organisasi</p><p class="font-medium text-slate-800 mt-0.5">{{ $booking->borrower_organization }}</p></div>@endif

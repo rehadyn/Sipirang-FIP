@@ -113,13 +113,70 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::get('/{building}/edit', \App\Livewire\Admin\Buildings\BuildingForm::class)->name('edit');
     });
 
-    // Settings
-    Route::get('/settings', \App\Livewire\Admin\Settings::class)->name('settings');
+    // Settings & Users — Sysadmin only
+    Route::middleware(['sysadmin'])->group(function () {
 
-    // Users — Sysadmin only
-    Route::prefix('users')->name('users.')->middleware(['sysadmin'])->group(function () {
-        Route::get('/', \App\Livewire\Admin\Users\UserList::class)->name('index');
-        Route::get('/create', \App\Livewire\Admin\Users\UserForm::class)->name('create');
-        Route::get('/{user}/edit', \App\Livewire\Admin\Users\UserForm::class)->name('edit');
-    });
+        Route::get('/settings', \App\Livewire\Admin\Settings::class)->name('settings');
+
+        // PDF preview dummy untuk testing dari halaman Pengaturan
+        Route::get('/settings/pdf-preview/{type}', function (string $type) {
+            abort_unless(in_array($type, ['receipt', 'approval'], true), 404);
+
+            // Dummy data — tidak disimpan ke DB
+            $building = new \App\Models\Building(['name' => 'Gedung A - Administrasi', 'code' => 'GED-A']);
+            $room     = new \App\Models\Room(['name' => 'Ruang Rapat Dekanat', 'code' => 'R-01', 'floor' => '1']);
+            $room->setRelation('building', $building);
+
+            $item = new \App\Models\BookingItem([
+                'booking_date' => now()->addDays(3)->format('Y-m-d'),
+                'session'      => \App\Models\Booking::SESSION_PAGI,
+                'start_time'   => now()->setTime(7, 0)->toDateTimeString(),
+                'end_time'     => now()->setTime(12, 0)->toDateTimeString(),
+            ]);
+            $item->setRelation('room', $room);
+
+            $booking = new \App\Models\Booking([
+                'ticket_number'         => 'FIP-RNG-SAMPLE',
+                'borrower_name'         => 'Contoh Nama Peminjam',
+                'borrower_id_number'    => '200101001',
+                'borrower_type'         => 'mahasiswa',
+                'borrower_organization' => 'Prodi Teknologi Pendidikan',
+                'purpose'               => 'Diskusi Kelompok dan Rapat Koordinasi',
+                'notes_admin'           => 'Pastikan ruangan dikembalikan dalam kondisi rapi.',
+                'status'                => 'approved',
+                'qr_token'              => \Illuminate\Support\Str::uuid()->toString(),
+                'reviewed_at'           => now(),
+            ]);
+            $booking->setRelation('items', collect([$item]));
+
+            $faculty      = \App\Helpers\SettingHelper::get('general.faculty_name', 'FIP UNM');
+            $university   = \App\Helpers\SettingHelper::get('general.university_name', 'UNM');
+            $deadlineHours = \App\Helpers\SettingHelper::get('booking.deadline_hours', 5);
+
+            if ($type === 'receipt') {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.booking-receipt', compact(
+                    'booking', 'faculty', 'university', 'deadlineHours'
+                ) + ['deadline_hours' => $deadlineHours]);
+                return $pdf->stream('PREVIEW_Tanda_Terima.pdf');
+            }
+
+            $qrUrl = 'data:image/svg+xml;base64,' . base64_encode(
+                \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(150)
+                    ->generate(url('/tracking/FIP-RNG-SAMPLE?qr=sample-preview'))
+            );
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.approval-letter', compact(
+                'booking', 'faculty', 'university', 'qrUrl'
+            ));
+            return $pdf->stream('PREVIEW_Surat_Izin.pdf');
+        })->where('type', 'receipt|approval')->name('settings.pdf-preview');
+
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', \App\Livewire\Admin\Users\UserList::class)->name('index');
+            Route::get('/create', \App\Livewire\Admin\Users\UserForm::class)->name('create');
+            Route::get('/{user}/edit', \App\Livewire\Admin\Users\UserForm::class)->name('edit');
+        });
+
+    }); // end sysadmin middleware group
+
 });

@@ -60,7 +60,12 @@
                         {{ $booking->rejection_reason ?? 'Maaf, permohonan Anda tidak dapat disetujui karena tidak memenuhi kriteria atau dokumen tidak lengkap.' }}
                     </p>
                     <div class="mt-3">
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', \App\Helpers\SettingHelper::get('general.phone', '08123456789')) }}" target="_blank" class="text-xs font-semibold text-red-700 hover:underline inline-flex items-center gap-1">
+                        @php
+                            $adminPhone = preg_replace('/[^0-9]/', '', \App\Helpers\SettingHelper::get('general.phone', '08123456789'));
+                            if (str_starts_with($adminPhone, '0')) $adminPhone = '62' . substr($adminPhone, 1);
+                            elseif (!str_starts_with($adminPhone, '62')) $adminPhone = '62' . $adminPhone;
+                        @endphp
+                        <a href="https://wa.me/{{ $adminPhone }}" target="_blank" class="text-xs font-semibold text-red-700 hover:underline inline-flex items-center gap-1">
                             Hubungi Admin via WhatsApp
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         </a>
