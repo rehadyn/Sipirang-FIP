@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Guest;
 
+use App\Models\BlockedDate;
 use App\Models\Booking;
 use App\Models\BookingItem;
 use App\Models\Building;
@@ -67,8 +68,14 @@ class LiveBoard extends Component
             }
         }
 
-        if (! $room->isAvailable($this->selectedDate, $startTime, $endTime)) {
-            $this->dispatch('toast', message: 'Ruangan tidak tersedia pada sesi yang dipilih.', type: 'error');
+        // Specific reason for unavailability
+        if ($room->blockedDates()->whereDate('blocked_date', $this->selectedDate)->exists()) {
+            $this->dispatch('toast', message: 'Ruangan diblokir pada tanggal ini.', type: 'error');
+            return;
+        }
+
+        if ($room->hasConflict($this->selectedDate, $startTime, $endTime)) {
+            $this->dispatch('toast', message: 'Sesi ini sudah dipesan oleh peminjam lain.', type: 'error');
             return;
         }
 
@@ -125,9 +132,18 @@ class LiveBoard extends Component
             ->get();
 
         $bookedSessions = [];
+        $blockedRoomIds = [];
+
         if ($this->selectedDate) {
+            // Blocked dates pada tanggal yang dipilih
+            $blockedRoomIds = BlockedDate::whereDate('blocked_date', $this->selectedDate)
+                ->pluck('room_id')
+                ->map(fn ($id) => (int) $id)
+                ->toArray();
+
+            // Existing bookings yang menjadi konflik
             $bookedItems = BookingItem::query()
-                ->where('booking_date', $this->selectedDate)
+                ->whereDate('booking_date', $this->selectedDate)
                 ->where('status', 'active')
                 ->whereHas('booking', function ($query) {
                     $query->whereNotIn('status', ['rejected', 'expired', 'cancelled']);
@@ -154,7 +170,10 @@ class LiveBoard extends Component
             }
         }
 
-        $availableCount = $rooms->filter(function ($room) use ($bookedSessions) {
+        $availableCount = $rooms->filter(function ($room) use ($bookedSessions, $blockedRoomIds) {
+            if (in_array((int) $room->id, $blockedRoomIds, true)) {
+                return false;
+            }
             $bookedForRoom = $bookedSessions[$room->id] ?? [];
             $isFull = count(array_intersect($bookedForRoom, [Booking::SESSION_PAGI, Booking::SESSION_SIANG])) >= 2
                 || in_array(Booking::SESSION_FULLDAY, $bookedForRoom);
@@ -165,6 +184,7 @@ class LiveBoard extends Component
             'rooms' => $rooms,
             'buildings' => $buildings,
             'bookedSessions' => $bookedSessions,
+            'blockedRoomIds' => $blockedRoomIds,
             'sessionTypes' => Booking::SESSION_TYPES,
             'availableCount' => $availableCount,
             'totalRooms' => $totalRooms,

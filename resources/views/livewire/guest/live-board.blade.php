@@ -139,11 +139,14 @@
                 @forelse ($rooms as $room)
                     @php
                         $roomBooked = $bookedSessions[$room->id] ?? [];
-                        $isFull = count(array_intersect($roomBooked, [\App\Models\Booking::SESSION_PAGI, \App\Models\Booking::SESSION_SIANG])) >= 2
-                            || in_array(\App\Models\Booking::SESSION_FULLDAY, $roomBooked);
+                        $isBlocked = in_array((int) $room->id, $blockedRoomIds, true);
+                        $isFull = ! $isBlocked && (
+                            count(array_intersect($roomBooked, [\App\Models\Booking::SESSION_PAGI, \App\Models\Booking::SESSION_SIANG])) >= 2
+                            || in_array(\App\Models\Booking::SESSION_FULLDAY, $roomBooked)
+                        );
                     @endphp
 
-                    <article class="rounded-xl border border-zinc-200 bg-white flex flex-col transition {{ $isFull ? 'opacity-70' : '' }}">
+                    <article class="rounded-xl border border-zinc-200 bg-white flex flex-col transition {{ $isFull || $isBlocked ? 'opacity-70' : '' }}">
                         {{-- Card Header --}}
                         <div class="p-5 border-b border-zinc-100">
                             <div class="flex items-start justify-between gap-3">
@@ -152,7 +155,9 @@
                                         <span class="text-[10px] uppercase tracking-wider font-semibold text-indigo-600">{{ $room->building->code }}</span>
                                         <span class="text-zinc-300">·</span>
                                         <span class="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">Lt. {{ $room->floor }}</span>
-                                        @if ($isFull)
+                                        @if ($isBlocked)
+                                            <span class="ml-auto inline-flex items-center gap-1 rounded bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-600 uppercase tracking-wider border border-zinc-200" aria-label="Ruangan diblokir pada tanggal ini">Diblokir</span>
+                                        @elseif ($isFull)
                                             <span class="ml-auto inline-flex items-center gap-1 rounded bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 uppercase tracking-wider border border-red-200">Penuh</span>
                                         @endif
                                     </div>
@@ -174,6 +179,15 @@
 
                         {{-- Sessions Always Visible --}}
                         <div class="p-3 space-y-1.5">
+                            @if ($isBlocked)
+                                <div class="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-4 text-center" role="status">
+                                    <svg class="mx-auto h-6 w-6 text-zinc-400 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <p class="text-xs font-semibold text-zinc-700">Diblokir pada tanggal ini</p>
+                                    <p class="text-[11px] text-zinc-500 mt-0.5">Coba pilih tanggal lain.</p>
+                                </div>
+                            @else
                             @foreach ($sessionTypes as $key => $sessionInfo)
                                 @php
                                     $isBooked = in_array($key, $roomBooked);
@@ -218,6 +232,7 @@
                                     @endif
                                 </div>
                             @endforeach
+                            @endif
                         </div>
                     </article>
                 @empty
