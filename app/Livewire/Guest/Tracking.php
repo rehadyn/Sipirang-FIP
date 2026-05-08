@@ -23,12 +23,17 @@ class Tracking extends Component
     {
         $this->ticketNumber = $ticketNumber;
         $this->phone = $request->query('phone', '');
+        $qr = (string) $request->query('qr', '');
 
         $this->booking = Booking::with(['items.room.building', 'documents', 'reviewer'])
             ->where('ticket_number', $this->ticketNumber)
             ->firstOrFail();
 
-        abort_unless($this->phone !== '' && $this->booking->borrower_whatsapp === $this->phone, 403, 'Akses tracking tidak valid. Nomor WhatsApp tidak sesuai.');
+        // Akses sah bila: QR token cocok (scan resmi) ATAU nomor WhatsApp cocok (peminjam sendiri)
+        $qrValid = $qr !== '' && $this->booking->qr_token && hash_equals((string) $this->booking->qr_token, $qr);
+        $phoneValid = $this->phone !== '' && $this->booking->borrower_whatsapp === $this->phone;
+
+        abort_unless($qrValid || $phoneValid, 403, 'Akses tracking tidak valid. Nomor WhatsApp tidak sesuai.');
     }
 
     public function uploadLetter(BookingService $bookingService, FileStorageService $fileStorageService)

@@ -56,7 +56,8 @@ class PDFService
 
     public function generateQRCode($token): string
     {
-        $url = route('tracking.show', ['ticketNumber' => Booking::where('qr_token', $token)->value('ticket_number')]);
+        $ticketNumber = Booking::where('qr_token', $token)->value('ticket_number');
+        $url = route('tracking.show', ['ticketNumber' => $ticketNumber]) . '?qr=' . urlencode($token);
         // generate base64 SVG to embed in PDF
         return 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(150)->generate($url));
     }
