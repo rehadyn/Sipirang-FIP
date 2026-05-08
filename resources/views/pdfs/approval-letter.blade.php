@@ -113,6 +113,12 @@
         </div>
         @endif
 
+        @if($booking->approval_letter_uploaded_at)
+        <div class="note-section" style="font-size: 10px; color: #666;">
+            Dokumen persyaratan diunggah pada: <strong>{{ \Carbon\Carbon::parse($booking->approval_letter_uploaded_at)->translatedFormat('d F Y, H:i:s') }}</strong>
+        </div>
+        @endif
+
         <div class="note-section">
             Demikian surat izin ini diberikan untuk dapat dipergunakan sebagaimana mestinya. Harap tunjukkan surat ini beserta QR Code kepada petugas keamanan/gedung pada hari pelaksanaan.
         </div>

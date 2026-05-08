@@ -93,9 +93,15 @@
 
                 @php
                     $steps = [
-                        ['label' => 'Booking Dibuat', 'desc' => 'Tiket berhasil didaftarkan ke sistem.', 'status' => true, 'failed' => false],
-                        ['label' => 'Upload Surat', 'desc' => 'Batas waktu 5 jam untuk unggah dokumen WD 2.', 'status' => in_array($booking->status, ['pending_review', 'approved']) || $booking->approval_letter_path, 'failed' => $booking->status === 'expired'],
-                        ['label' => 'Verifikasi Admin', 'desc' => 'Estimasi verifikasi maksimal 2 hari kerja.', 'status' => in_array($booking->status, ['approved']), 'failed' => $booking->status === 'rejected'],
+                        ['label' => 'Booking Dibuat',  'desc' => 'Tiket berhasil didaftarkan — ' . $booking->created_at->translatedFormat('d M Y, H:i:s'), 'status' => true, 'failed' => false],
+                        ['label' => 'Upload Surat',   'desc' => $booking->approval_letter_uploaded_at
+                            ? 'Dikirim pada ' . $booking->approval_letter_uploaded_at->translatedFormat('d M Y, H:i:s')
+                            : 'Batas waktu ' . (\App\Helpers\SettingHelper::get('booking.deadline_hours', 5)) . ' jam untuk unggah dokumen WD 2.',
+                            'status' => in_array($booking->status, ['pending_review', 'approved']) || $booking->approval_letter_path, 'failed' => $booking->status === 'expired'],
+                        ['label' => 'Verifikasi Admin', 'desc' => $booking->reviewed_at
+                            ? ($booking->status === 'approved' ? 'Disetujui pada ' : 'Ditolak pada ') . $booking->reviewed_at->translatedFormat('d M Y, H:i:s')
+                            : 'Estimasi verifikasi maksimal 2 hari kerja.',
+                            'status' => in_array($booking->status, ['approved']), 'failed' => $booking->status === 'rejected'],
                         ['label' => 'Selesai', 'desc' => 'Booking disetujui & surat izin terbit.', 'status' => $booking->status === 'approved', 'failed' => false]
                     ];
                 @endphp

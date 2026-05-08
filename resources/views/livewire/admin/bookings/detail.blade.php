@@ -182,7 +182,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold text-amber-900">Surat Persetujuan WD2</p>
-                                <p class="text-xs text-amber-500 mt-0.5">Diunggah: {{ $booking->approval_letter_uploaded_at?->translatedFormat('d M Y, H:i') ?? '—' }}</p>
+                                <p class="text-xs text-amber-500 mt-0.5">Diunggah: {{ $booking->approval_letter_uploaded_at?->translatedFormat('d M Y, H:i:s') ?? '—' }}</p>
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
                                 <button @click="previewOpen = !previewOpen"
@@ -307,7 +307,7 @@
                     @if($booking->approval_letter_uploaded_at)
                     <div class="flex gap-3">
                         <div class="flex flex-col items-center"><div class="h-2 w-2 rounded-full bg-blue-500 mt-1"></div><div class="flex-1 w-px bg-slate-200 my-1"></div></div>
-                        <div><p class="font-medium text-slate-700">Surat diunggah</p><p class="text-slate-400">{{ $booking->approval_letter_uploaded_at->translatedFormat('d M Y, H:i') }}</p></div>
+                        <div><p class="font-medium text-slate-700">Surat diunggah</p><p class="text-slate-400">{{ $booking->approval_letter_uploaded_at->translatedFormat('d M Y, H:i:s') }}</p></div>
                     </div>
                     @endif
                     @if($booking->reviewed_at)
