@@ -3,6 +3,7 @@
 namespace App\Livewire\Guest;
 
 use App\Exceptions\BookingException;
+use App\Helpers\SettingHelper;
 use App\Models\Booking;
 use App\Services\BookingService;
 use App\Services\FileStorageService;
@@ -44,6 +45,12 @@ class Checkout extends Component
 
     public function submit(BookingService $bookingService, FileStorageService $fileStorageService)
     {
+        $maxItems = (int) SettingHelper::get('booking.max_items_per_cart', 5);
+        if (count($this->cartItems) > $maxItems) {
+            $this->addError('cart', "Jumlah slot melebihi batas maksimal ({$maxItems} slot per pengajuan). Silakan hapus beberapa item dari keranjang.");
+            return;
+        }
+
         $rules = [
             'borrower_name' => ['required', 'string', 'max:255'],
             'borrower_id_number' => ['required', 'string', 'max:30'],

@@ -35,7 +35,7 @@ class BookingService
                 'purpose' => $data['purpose'],
                 'ktp_file_path' => $data['ktp_file_path'] ?? null,
                 'status' => Booking::STATUS_PENDING_UPLOAD,
-                'deadline_at' => now()->addHours(5),
+                'deadline_at' => now()->addHours((int) $this->settingHelper->get('booking.deadline_hours', 5)),
                 'qr_token' => (string) Str::uuid(),
             ]);
 

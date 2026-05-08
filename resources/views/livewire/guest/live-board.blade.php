@@ -27,7 +27,10 @@
                         <div class="mt-1 text-base font-semibold text-zinc-900">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}</div>
                     </div>
                     <div class="w-full sm:w-auto relative">
-                        <input type="date" wire:model.live="selectedDate" min="{{ now()->format('Y-m-d') }}" class="w-full sm:w-auto min-w-[200px] cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                        <input type="date" wire:model.live="selectedDate"
+                            min="{{ now()->format('Y-m-d') }}"
+                            max="{{ now()->addDays((int)\App\Helpers\SettingHelper::get('booking.max_days_advance', 30))->format('Y-m-d') }}"
+                            class="w-full sm:w-auto min-w-[200px] cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
                         <div wire:loading wire:target="selectedDate" class="absolute right-3 top-1/2 -translate-y-1/2">
                             <svg class="animate-spin h-4 w-4 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

@@ -18,9 +18,6 @@ class Settings extends Component
     public string|int $max_items_per_cart  = 5;
     public string|int $max_days_advance    = 30;
 
-    // PDF
-    public string $pdf_header_text = '';
-    public string $pdf_footer_text = '';
 
     public function mount(): void
     {
@@ -33,8 +30,6 @@ class Settings extends Component
         $this->max_items_per_cart = SettingHelper::get('booking.max_items_per_cart', 5);
         $this->max_days_advance  = SettingHelper::get('booking.max_days_advance', 30);
 
-        $this->pdf_header_text   = SettingHelper::get('pdf.header_text', '');
-        $this->pdf_footer_text   = SettingHelper::get('pdf.footer_text', '');
     }
 
     public function saveGeneral(): void
@@ -76,22 +71,6 @@ class Settings extends Component
         SettingHelper::set('booking.max_days_advance', (int) $this->max_days_advance, 'integer', 'booking');
 
         session()->flash('success', 'Pengaturan booking berhasil disimpan.');
-    }
-
-    public function savePdf(): void
-    {
-        $this->validate([
-            'pdf_header_text' => ['nullable', 'string', 'max:255'],
-            'pdf_footer_text' => ['nullable', 'string', 'max:255'],
-        ], [], [
-            'pdf_header_text' => 'header PDF',
-            'pdf_footer_text' => 'footer PDF',
-        ]);
-
-        SettingHelper::set('pdf.header_text', $this->pdf_header_text, 'string', 'pdf');
-        SettingHelper::set('pdf.footer_text', $this->pdf_footer_text, 'string', 'pdf');
-
-        session()->flash('success', 'Pengaturan PDF berhasil disimpan.');
     }
 
     public function render()

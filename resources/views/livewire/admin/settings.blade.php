@@ -107,33 +107,24 @@
             </div>
         </div>
 
-        {{-- Pengaturan PDF --}}
+        {{-- Info PDF --}}
         <div class="rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
-            <div class="flex items-center gap-2 mb-5">
+            <div class="flex items-center gap-2 mb-4">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <h2 class="text-sm font-semibold text-slate-700">Dokumen PDF</h2>
             </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1.5">Teks Header PDF</label>
-                    <input wire:model="pdf_header_text" type="text" placeholder="cth. SIPIRANG - Sistem Peminjaman Ruangan"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400">
-                    <p class="text-xs text-slate-400 mt-1">Digunakan sebagai judul pada template PDF (opsional).</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1.5">Teks Footer PDF</label>
-                    <input wire:model="pdf_footer_text" type="text" placeholder="cth. Fakultas Ilmu Pendidikan, Universitas Negeri Makassar"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400">
-                </div>
-            </div>
-            <div class="mt-5 border-t border-slate-100 pt-4">
-                <button wire:click="savePdf" wire:loading.attr="disabled"
-                    class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition">
-                    <span wire:loading.remove wire:target="savePdf">Simpan Pengaturan PDF</span>
-                    <span wire:loading wire:target="savePdf">Menyimpan...</span>
-                </button>
+            <div class="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+                <p class="text-xs text-emerald-800 leading-relaxed">
+                    Header PDF (nama universitas, nama fakultas, nomor telepon, email) diambil langsung dari
+                    <strong>Informasi Institusi</strong> di atas. Cukup perbarui data di sana — semua PDF yang diterbitkan
+                    setelah penyimpanan akan menggunakan nilai terbaru.
+                </p>
+                <p class="text-xs text-emerald-700 mt-2 leading-relaxed">
+                    PDF yang sudah diterbitkan sebelumnya <strong>tidak diperbarui otomatis</strong>. Untuk memperbaruinya,
+                    admin dapat approve ulang booking yang bersangkutan dari halaman detail booking.
+                </p>
             </div>
         </div>
 

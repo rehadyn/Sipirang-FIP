@@ -28,8 +28,8 @@
 </head>
 <body>
     <div class="header">
-        <h2>UNIVERSITAS NEGERI MAKASSAR</h2>
-        <h1>FAKULTAS ILMU PENDIDIKAN</h1>
+        <h2>{{ strtoupper($university ?? 'UNIVERSITAS NEGERI MAKASSAR') }}</h2>
+        <h1>{{ strtoupper($faculty ?? 'FAKULTAS ILMU PENDIDIKAN') }}</h1>
         <p>Alamat: Kampus UNM Tidung, Jl. Tamalate 1, Makassar. Telp: (0411) 883076</p>
         <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span> | Email: fip@unm.ac.id</p>
     </div>
@@ -84,7 +84,7 @@
         </table>
 
         <div class="note-section">
-            <strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara. Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking) sebelum batas waktu habis.
+            <strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara. Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking) dalam waktu maksimal <strong>{{ $deadline_hours ?? 5 }} jam</strong> setelah booking dibuat. Booking akan dibatalkan otomatis jika batas waktu terlewati.
         </div>
     </div>
 

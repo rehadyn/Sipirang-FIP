@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Guest;
 
+use App\Helpers\SettingHelper;
 use App\Models\BlockedDate;
 use App\Models\Booking;
 use App\Models\BookingItem;
@@ -43,6 +44,12 @@ class LiveBoard extends Component
 
         if ($this->selectedDate < date('Y-m-d')) {
             $this->dispatch('toast', message: 'Tidak dapat memesan untuk tanggal yang sudah lewat.', type: 'error');
+            return;
+        }
+
+        $maxDays = (int) SettingHelper::get('booking.max_days_advance', 30);
+        if ($this->selectedDate > now()->addDays($maxDays)->format('Y-m-d')) {
+            $this->dispatch('toast', message: "Pemesanan hanya bisa dilakukan maksimal {$maxDays} hari ke depan.", type: 'error');
             return;
         }
 
