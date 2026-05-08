@@ -84,7 +84,13 @@
         </table>
 
         <div class="note-section">
-            <strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara. Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking) dalam waktu maksimal <strong>{{ $deadline_hours ?? 5 }} jam</strong> setelah booking dibuat. Booking akan dibatalkan otomatis jika batas waktu terlewati.
+            <strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara.
+            Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking)
+            <strong>paling lambat {{ $deadline_hours ?? 5 }} jam</strong> setelah booking dibuat.
+            @if(!empty($booking->deadline_at))
+            Batas waktu upload: <strong>{{ \Carbon\Carbon::parse($booking->deadline_at)->translatedFormat('d F Y, H:i:s') }}</strong>.
+            @endif
+            Booking akan dibatalkan otomatis jika batas waktu terlewati.
         </div>
     </div>
 

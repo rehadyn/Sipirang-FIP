@@ -99,9 +99,10 @@ class Checkout extends Component
         Session::forget('guest_booking_cart');
 
         session()->flash('status', 'Booking berhasil dibuat. Mohon upload Surat Persetujuan WD 2 sebelum batas waktu habis.');
+        session()->flash('auto_download_receipt', true);
         return redirect()->route('tracking.show', [
-            'ticketNumber' => $booking->ticket_number, 
-            'phone' => $booking->borrower_whatsapp
+            'ticketNumber' => $booking->ticket_number,
+            'phone'        => $booking->borrower_whatsapp,
         ]);
     }
 
