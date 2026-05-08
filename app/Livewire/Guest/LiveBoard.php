@@ -4,6 +4,7 @@ namespace App\Livewire\Guest;
 
 use App\Models\Booking;
 use App\Models\BookingItem;
+use App\Models\Building;
 use App\Models\Room;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -13,6 +14,8 @@ class LiveBoard extends Component
 {
     public $selectedDate;
     public $cartItems = [];
+    public $buildingFilter = '';
+    public $search = '';
 
     public function mount()
     {
@@ -20,18 +23,33 @@ class LiveBoard extends Component
         $this->cartItems = Session::get('guest_booking_cart', []);
     }
 
+    public function updatedBuildingFilter(): void
+    {
+        // reset hook reserved for analytics or paging
+    }
+
+    public function updatedSearch(): void
+    {
+        // debounce handled di blade via wire:model.live.debounce.300ms
+    }
+
     public function addToCart($roomId, $sessionKey)
     {
         if (empty($this->selectedDate)) {
-            $this->addError('date', 'Pilih tanggal terlebih dahulu.');
+            $this->dispatch('toast', message: 'Pilih tanggal terlebih dahulu.', type: 'error');
+            return;
+        }
+
+        if ($this->selectedDate < date('Y-m-d')) {
+            $this->dispatch('toast', message: 'Tidak dapat memesan untuk tanggal yang sudah lewat.', type: 'error');
             return;
         }
 
         $room = Room::findOrFail($roomId);
-        
+
         $sessionInfo = Booking::SESSION_TYPES[$sessionKey] ?? null;
         if (!$sessionInfo) {
-            $this->addError('session', 'Sesi waktu tidak valid.');
+            $this->dispatch('toast', message: 'Sesi waktu tidak valid.', type: 'error');
             return;
         }
 
@@ -44,13 +62,13 @@ class LiveBoard extends Component
                 && $existingItem['booking_date'] === $this->selectedDate
                 && $existingItem['session'] === $sessionKey
             ) {
-                $this->addError('cart', 'Ruangan dan sesi waktu ini sudah ada di keranjang.');
+                $this->dispatch('toast', message: 'Sesi ini sudah ada di keranjang.', type: 'error');
                 return;
             }
         }
 
         if (! $room->isAvailable($this->selectedDate, $startTime, $endTime)) {
-            $this->addError('cart', 'Ruangan tidak tersedia pada sesi waktu yang dipilih.');
+            $this->dispatch('toast', message: 'Ruangan tidak tersedia pada sesi yang dipilih.', type: 'error');
             return;
         }
 
@@ -69,7 +87,7 @@ class LiveBoard extends Component
         ];
 
         Session::put('guest_booking_cart', $this->cartItems);
-        session()->flash('status', 'Jadwal ruangan berhasil ditambahkan ke keranjang.');
+        $this->dispatch('toast', message: "{$room->name} · {$sessionInfo['label']} ditambahkan.", type: 'success');
     }
 
     public function removeFromCart($index)
@@ -78,16 +96,32 @@ class LiveBoard extends Component
             unset($this->cartItems[$index]);
             $this->cartItems = array_values($this->cartItems);
             Session::put('guest_booking_cart', $this->cartItems);
-            session()->flash('status', 'Item keranjang berhasil dihapus.');
+            $this->dispatch('toast', message: 'Item dihapus dari keranjang.', type: 'success');
         }
     }
 
     public function render()
     {
+        $totalRooms = Room::query()->active()->count();
+
         $rooms = Room::query()
-            ->with(['building', 'facilities'])
+            ->with(['building'])
             ->active()
+            ->when($this->buildingFilter, fn ($q) => $q->where('building_id', $this->buildingFilter))
+            ->when(trim($this->search) !== '', function ($q) {
+                $term = '%' . trim($this->search) . '%';
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('name', 'like', $term)
+                          ->orWhere('code', 'like', $term)
+                          ->orWhereHas('building', fn ($b) => $b->where('name', 'like', $term)->orWhere('code', 'like', $term));
+                });
+            })
             ->ordered()
+            ->get();
+
+        $buildings = Building::query()
+            ->whereHas('rooms', fn ($q) => $q->active())
+            ->orderBy('name')
             ->get();
 
         $bookedSessions = [];
@@ -99,34 +133,41 @@ class LiveBoard extends Component
                     $query->whereNotIn('status', ['rejected', 'expired', 'cancelled']);
                 })
                 ->get();
-                
+
             foreach ($bookedItems as $item) {
                 if ($item->session) {
                     $bookedSessions[$item->room_id][] = $item->session;
-                    
-                    // Logic Overlap: Jika Fullday, blokir Pagi & Siang
+
                     if ($item->session === Booking::SESSION_FULLDAY) {
                         $bookedSessions[$item->room_id][] = Booking::SESSION_PAGI;
                         $bookedSessions[$item->room_id][] = Booking::SESSION_SIANG;
                     }
-                    
-                    // Jika Pagi atau Siang, blokir Fullday
+
                     if ($item->session === Booking::SESSION_PAGI || $item->session === Booking::SESSION_SIANG) {
                         $bookedSessions[$item->room_id][] = Booking::SESSION_FULLDAY;
                     }
                 }
             }
-            
-            // Uniquify the booked sessions
+
             foreach ($bookedSessions as $roomId => $sessions) {
                 $bookedSessions[$roomId] = array_unique($sessions);
             }
         }
 
+        $availableCount = $rooms->filter(function ($room) use ($bookedSessions) {
+            $bookedForRoom = $bookedSessions[$room->id] ?? [];
+            $isFull = count(array_intersect($bookedForRoom, [Booking::SESSION_PAGI, Booking::SESSION_SIANG])) >= 2
+                || in_array(Booking::SESSION_FULLDAY, $bookedForRoom);
+            return ! $isFull;
+        })->count();
+
         return view('livewire.guest.live-board', [
             'rooms' => $rooms,
+            'buildings' => $buildings,
             'bookedSessions' => $bookedSessions,
             'sessionTypes' => Booking::SESSION_TYPES,
+            'availableCount' => $availableCount,
+            'totalRooms' => $totalRooms,
         ])->layout('layouts.guest');
     }
 }
