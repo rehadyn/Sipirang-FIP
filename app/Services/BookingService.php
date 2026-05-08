@@ -129,15 +129,36 @@ class BookingService
     }
 
     /**
-     * Auto-expire overdue bookings
+     * Auto-expire overdue bookings (status=pending_upload, deadline_at < now).
+     * Juga cancel BookingItem agar slot bebas kembali di live-board.
      */
     public function expireOverdueBookings(): int
     {
-        return Booking::overdue()->update([
-            'status' => Booking::STATUS_EXPIRED,
-            'cancellation_type' => 'auto_expired',
-            'cancelled_at' => now(),
-        ]);
+        $overdueIds = Booking::overdue()->pluck('id');
+
+        if ($overdueIds->isEmpty()) {
+            return 0;
+        }
+
+        return DB::transaction(function () use ($overdueIds) {
+            $now = now();
+
+            $count = Booking::whereIn('id', $overdueIds)->update([
+                'status' => Booking::STATUS_EXPIRED,
+                'cancellation_type' => 'auto_expired',
+                'cancelled_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            BookingItem::whereIn('booking_id', $overdueIds)
+                ->where('status', BookingItem::STATUS_ACTIVE)
+                ->update([
+                    'status' => BookingItem::STATUS_CANCELLED,
+                    'updated_at' => $now,
+                ]);
+
+            return $count;
+        });
     }
 
     /**
