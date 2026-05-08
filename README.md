@@ -271,7 +271,12 @@ sipirang/
 │   ├── bookings/                     # PDF receipt & surat izin (public disk)
 │   └── uploads/                      # KTP & surat WD 2 (private disk)
 │
-├── PANDUAN_PEMINJAMAN.md             # SOP & best practice penggunaan
+├── doc/
+│   ├── PANDUAN_PEMINJAMAN.md         # SOP & best practice penggunaan
+│   ├── SIPIRANG_SPECS.md
+│   ├── IMPLEMENTATION.md
+│   ├── QUICK_START.md
+│   └── SLA_RULES.md
 └── README.md
 ```
 
@@ -385,7 +390,7 @@ Terjadi saat banyak concurrent write. Untuk production dengan banyak pengguna, m
 
 ## 📖 Panduan Best Practice
 
-Lihat [PANDUAN_PEMINJAMAN.md](PANDUAN_PEMINJAMAN.md) untuk:
+Lihat [doc/PANDUAN_PEMINJAMAN.md](doc/PANDUAN_PEMINJAMAN.md) untuk:
 - Alur lengkap peminjam (6 langkah detail)
 - Checklist harian admin
 - Diagram alur sistem
