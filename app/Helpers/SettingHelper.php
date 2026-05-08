@@ -19,7 +19,7 @@ class SettingHelper
         }
 
         // Get from database
-        $setting = Setting::whereKey($key)->first();
+        $setting = Setting::where('key', $key)->first();
         $value = $setting ? $setting->value : $default;
 
         // Cast value based on type
