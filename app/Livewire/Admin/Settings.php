@@ -10,21 +10,25 @@ class Settings extends Component
     // General
     public string $faculty_name       = '';
     public string $university_name    = '';
-    public string $phone              = '';
-    public string $email              = '';
+    public string $faculty_phone      = '';
+    public string $faculty_email      = '';
 
     // Booking
     public string|int $deadline_hours      = 5;
     public string|int $max_items_per_cart  = 5;
     public string|int $max_days_advance    = 30;
 
+    // Inline feedback (sectionName → 'saved' | '')
+    public string $generalSaved = '';
+    public string $bookingSaved = '';
+
 
     public function mount(): void
     {
         $this->faculty_name      = SettingHelper::get('general.faculty_name', '');
         $this->university_name   = SettingHelper::get('general.university_name', '');
-        $this->phone             = SettingHelper::get('general.phone', '');
-        $this->email             = SettingHelper::get('general.email', '');
+        $this->faculty_phone     = SettingHelper::get('general.phone', '');
+        $this->faculty_email     = SettingHelper::get('general.email', '');
 
         $this->deadline_hours    = SettingHelper::get('booking.deadline_hours', 5);
         $this->max_items_per_cart = SettingHelper::get('booking.max_items_per_cart', 5);
@@ -37,21 +41,21 @@ class Settings extends Component
         $this->validate([
             'faculty_name'    => ['required', 'string', 'max:255'],
             'university_name' => ['required', 'string', 'max:255'],
-            'phone'           => ['nullable', 'string', 'max:30'],
-            'email'           => ['nullable', 'email', 'max:255'],
+            'faculty_phone'   => ['nullable', 'string', 'max:30'],
+            'faculty_email'   => ['nullable', 'string', 'max:255'],
         ], [], [
             'faculty_name'    => 'nama fakultas',
             'university_name' => 'nama universitas',
-            'phone'           => 'nomor telepon',
-            'email'           => 'email',
+            'faculty_phone'   => 'nomor telepon',
+            'faculty_email'   => 'email',
         ]);
 
         SettingHelper::set('general.faculty_name', $this->faculty_name, 'string', 'general');
         SettingHelper::set('general.university_name', $this->university_name, 'string', 'general');
-        SettingHelper::set('general.phone', $this->phone, 'string', 'general');
-        SettingHelper::set('general.email', $this->email, 'string', 'general');
+        SettingHelper::set('general.phone', $this->faculty_phone, 'string', 'general');
+        SettingHelper::set('general.email', $this->faculty_email, 'string', 'general');
 
-        session()->flash('success', 'Pengaturan umum berhasil disimpan.');
+        $this->generalSaved = 'saved';
     }
 
     public function saveBooking(): void
@@ -70,7 +74,7 @@ class Settings extends Component
         SettingHelper::set('booking.max_items_per_cart', (int) $this->max_items_per_cart, 'integer', 'booking');
         SettingHelper::set('booking.max_days_advance', (int) $this->max_days_advance, 'integer', 'booking');
 
-        session()->flash('success', 'Pengaturan booking berhasil disimpan.');
+        $this->bookingSaved = 'saved';
     }
 
     public function render()

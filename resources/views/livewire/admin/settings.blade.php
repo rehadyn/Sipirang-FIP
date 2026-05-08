@@ -30,23 +30,33 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1.5">No. Telepon Fakultas</label>
-                    <input wire:model="phone" type="text" placeholder="cth. (0411) 883076"
+                    <input wire:model="faculty_phone" type="text" placeholder="cth. (0411) 883076"
                         class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400">
                     <p class="text-xs text-slate-400 mt-1">Muncul di header PDF & tombol WA admin</p>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1.5">Email Fakultas</label>
-                    <input wire:model="email" type="email" placeholder="cth. fip@unm.ac.id"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400 @error('email') border-red-300 @enderror">
-                    @error('email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                    <input wire:model="faculty_email" type="text" placeholder="cth. fip@unm.ac.id"
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-indigo-400 @error('faculty_email') border-red-300 @enderror">
+                    @error('faculty_email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
-            <div class="mt-5 border-t border-slate-100 pt-4">
-                <button wire:click="saveGeneral" wire:loading.attr="disabled"
-                    class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition">
+            <div class="mt-5 border-t border-slate-100 pt-4 flex items-center gap-3">
+                <button wire:click="saveGeneral" wire:loading.attr="disabled" wire:target="saveGeneral"
+                    class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-60">
                     <span wire:loading.remove wire:target="saveGeneral">Simpan Informasi Institusi</span>
-                    <span wire:loading wire:target="saveGeneral">Menyimpan...</span>
+                    <span wire:loading wire:target="saveGeneral" class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                        Menyimpan...
+                    </span>
                 </button>
+                @if($generalSaved === 'saved')
+                <span x-data x-init="setTimeout(() => $wire.set('generalSaved', ''), 3000)"
+                    class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Tersimpan
+                </span>
+                @endif
             </div>
         </div>
 
@@ -93,12 +103,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-5 border-t border-slate-100 pt-4">
-                    <button wire:click="saveBooking" wire:loading.attr="disabled"
-                        class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition">
+                <div class="mt-5 border-t border-slate-100 pt-4 flex items-center gap-3">
+                    <button wire:click="saveBooking" wire:loading.attr="disabled" wire:target="saveBooking"
+                        class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition disabled:opacity-60">
                         <span wire:loading.remove wire:target="saveBooking">Simpan Pengaturan Booking</span>
-                        <span wire:loading wire:target="saveBooking">Menyimpan...</span>
+                        <span wire:loading wire:target="saveBooking" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            Menyimpan...
+                        </span>
                     </button>
+                    @if($bookingSaved === 'saved')
+                    <span x-data x-init="setTimeout(() => $wire.set('bookingSaved', ''), 3000)"
+                        class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        Tersimpan
+                    </span>
+                    @endif
                 </div>
             </div>
 
