@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <title>Tanda Terima Booking</title>
     <style>
-        body { font-family: sans-serif; font-size: 14px; line-height: 1.5; color: #333; }
-        .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 20px; }
-        .header h1 { margin: 0; font-size: 18pt; text-transform: uppercase; }
-        .header h2 { margin: 0; font-size: 14pt; text-transform: uppercase; }
-        .header p { margin: 2px 0 0; font-size: 10pt; line-height: 1.2; }
-        .content { margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f5f5f5; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #666; border-top: 1px dashed #ccc; padding-top: 20px; }
+        body { font-family: sans-serif; font-size: 12px; line-height: 1.6; color: #333; }
+        .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 16pt; text-transform: uppercase; }
+        .header h2 { margin: 0; font-size: 13pt; text-transform: uppercase; }
+        .header p { margin: 2px 0 0; font-size: 9pt; line-height: 1.3; color: #555; }
+        .title-section { text-align: center; margin-bottom: 20px; }
+        .status-badge { display: inline-block; padding: 5px 18px; border-radius: 5px; font-weight: bold; font-size: 11pt; margin-bottom: 8px; }
+        .badge-pending { background-color: #f59e0b; color: white; }
+        h3 { margin: 4px 0; font-size: 13pt; text-decoration: underline; }
+        .ticket-number { margin: 4px 0 0; font-size: 11pt; }
+        .content { margin-bottom: 20px; }
+        .info-table { width: 100%; border: none; margin: 8px 0 15px; }
+        .info-table td { border: none; padding: 4px 0; font-size: 12px; }
+        .info-table td:first-child { width: 160px; }
+        table.schedule { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table.schedule th, table.schedule td { border: 1px solid #ddd; padding: 9px 10px; text-align: left; font-size: 12px; }
+        table.schedule th { background-color: #f5f5f5; font-weight: bold; }
+        .note-section { margin-top: 18px; font-size: 12px; }
+        .footer { margin-top: 40px; }
+        .footer-stamp { border-top: 1px dashed #ccc; padding-top: 15px; text-align: center; font-size: 10px; color: #666; }
     </style>
 </head>
 <body>
@@ -24,33 +34,35 @@
         <p>Laman: <span style="color: blue; text-decoration: underline;">fip.unm.ac.id</span> | Email: fip@unm.ac.id</p>
     </div>
 
-    <div class="content">
-        <h3 style="text-align: center; text-decoration: underline;">TANDA TERIMA BOOKING SEMENTARA</h3>
-        <p style="text-align: center;">Nomor Tiket: <strong>{{ $booking->ticket_number }}</strong></p>
+    <div class="title-section">
+        <div class="status-badge badge-pending">MENUNGGU PERSETUJUAN</div>
+        <h3>TANDA TERIMA BOOKING SEMENTARA</h3>
+        <p class="ticket-number">Nomor Tiket: <strong>{{ $booking->ticket_number }}</strong></p>
+    </div>
 
+    <div class="content">
         <p>Telah diterima data pendaftaran peminjaman ruangan dari:</p>
-        <table style="border: none;">
+        <table class="info-table">
             <tr>
-                <td style="border: none; width: 150px; padding: 5px 0;">Nama Lengkap</td>
-                <td style="border: none; padding: 5px 0;">: {{ $booking->borrower_name }}</td>
+                <td>Nama Lengkap</td>
+                <td>: {{ $booking->borrower_name }}</td>
             </tr>
             <tr>
-                <td style="border: none; padding: 5px 0;">NIM / NIP</td>
-                <td style="border: none; padding: 5px 0;">: {{ $booking->borrower_id_number }}</td>
+                <td>NIM / NIP</td>
+                <td>: {{ $booking->borrower_id_number }}</td>
             </tr>
             <tr>
-                <td style="border: none; padding: 5px 0;">Organisasi/Prodi</td>
-                <td style="border: none; padding: 5px 0;">: {{ $booking->borrower_organization ?? '-' }}</td>
+                <td>Organisasi/Prodi</td>
+                <td>: {{ $booking->borrower_organization ?? '-' }}</td>
             </tr>
             <tr>
-                <td style="border: none; padding: 5px 0;">Keperluan</td>
-                <td style="border: none; padding: 5px 0;">: {{ $booking->purpose }}</td>
+                <td>Keperluan</td>
+                <td>: {{ $booking->purpose }}</td>
             </tr>
         </table>
 
         <p>Daftar ruangan dan jadwal yang di-booking:</p>
-
-        <table>
+        <table class="schedule">
             <thead>
                 <tr>
                     <th>No</th>
@@ -71,11 +83,15 @@
             </tbody>
         </table>
 
-        <p style="margin-top: 20px;"><strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara. Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking) sebelum batas waktu habis.</p>
+        <div class="note-section">
+            <strong>Peringatan:</strong> Ini hanyalah tanda terima bahwa slot ruangan Anda telah dikunci sementara. Anda wajib mengunggah (upload) Surat Permohonan / Persetujuan resmi (contoh: Surat WD 2) di sistem pelacakan (tracking) sebelum batas waktu habis.
+        </div>
     </div>
 
     <div class="footer">
-        Dicetak secara otomatis oleh Sistem Peminjaman Ruangan (SIPIRANG) pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }}
+        <div class="footer-stamp">
+            Dicetak secara otomatis oleh Sistem Peminjaman Ruangan (SIPIRANG) pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }}
+        </div>
     </div>
 </body>
 </html>
