@@ -116,13 +116,13 @@
 
             @if($booking->booking_pdf_path)
                 <div class="mt-10 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ Storage::url($booking->booking_pdf_path) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50">
+                    <a href="{{ route('tracking.pdf', ['ticketNumber' => $booking->ticket_number, 'type' => 'receipt']) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Tanda Terima Booking
                     </a>
 
                     @if($booking->status === 'approved' && $booking->approval_pdf_path)
-                        <a href="{{ Storage::url($booking->approval_pdf_path) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700">
+                        <a href="{{ route('tracking.pdf', ['ticketNumber' => $booking->ticket_number, 'type' => 'approval']) }}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             Unduh Surat Izin Resmi
                         </a>

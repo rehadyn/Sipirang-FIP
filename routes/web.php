@@ -6,7 +6,9 @@ use App\Livewire\Guest\LiveBoard;
 use App\Livewire\Guest\Checkout;
 use App\Livewire\Guest\Tracking;
 use App\Livewire\Guest\Guide;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // ─── Guest Routes ──────────────────────────────────────────────────────────────
 Route::get('/', function () {
@@ -22,6 +24,26 @@ Route::prefix('booking')->name('guest.bookings.')->group(function () {
 
 Route::prefix('tracking')->name('tracking.')->group(function () {
     Route::get('/{ticketNumber}', Tracking::class)->name('show');
+    Route::get('/{ticketNumber}/pdf/{type}', function (string $ticketNumber, string $type) {
+        abort_unless(in_array($type, ['receipt', 'approval'], true), 404);
+
+        $booking = Booking::where('ticket_number', $ticketNumber)->firstOrFail();
+
+        if ($type === 'approval') {
+            abort_unless($booking->status === Booking::STATUS_APPROVED, 403);
+            $path = $booking->approval_pdf_path;
+            $filename = "Surat_Izin_{$booking->ticket_number}.pdf";
+        } else {
+            $path = $booking->booking_pdf_path;
+            $filename = "Bukti_Booking_{$booking->ticket_number}.pdf";
+        }
+
+        abort_if(!$path || !Storage::disk('bookings')->exists($path), 404, 'File PDF tidak ditemukan.');
+
+        return Storage::disk('bookings')->response($path, $filename, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    })->where('type', 'receipt|approval')->name('pdf');
 });
 
 Route::get('/calendar', \App\Livewire\Guest\RoomCalendar::class)->name('guest.calendar');
